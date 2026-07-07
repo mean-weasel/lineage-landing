@@ -9,6 +9,7 @@ import {
   Play,
   RotateCcw,
 } from "lucide-react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { heroScenario, type HeroScenarioStep } from "@/lib/hero-scenario";
 
@@ -18,6 +19,8 @@ type HeroScenarioPlayerProps = {
 };
 
 type ScenarioPhase = HeroScenarioStep["type"];
+type JsonHighlight = "parent" | "prompt" | "patch" | "children";
+const STEP_DURATION_MS = 880;
 
 function stepPhase(stepIndex: number): ScenarioPhase {
   return heroScenario.steps[stepIndex]?.type ?? "idle";
@@ -36,12 +39,25 @@ function buildAgentState(phase: ScenarioPhase) {
     ? heroScenario.parent.id
     : null;
   const prompt = hasReached(phase, "show-prompt") ? heroScenario.prompts[0] : null;
+  const patch = hasReached(phase, "write-json") ? heroScenario.patches[0] : null;
   const children = hasReached(phase, "create-children") ? heroScenario.children : [];
 
   return {
     selected_parent: selectedParent,
     prompt_id: prompt?.id ?? null,
     prompt: prompt?.prompt ?? null,
+    patch_id: patch?.id ?? null,
+    patch_status: patch
+      ? hasReached(phase, "create-children")
+        ? "applied"
+        : "queued"
+      : null,
+    operations:
+      patch?.operations.map((operation) => ({
+        op: operation.op,
+        path: operation.path,
+        asset_id: operation.assetId,
+      })) ?? [],
     children: children.map((child) => ({
       asset_id: child.id,
       title: child.title,
@@ -50,18 +66,136 @@ function buildAgentState(phase: ScenarioPhase) {
   };
 }
 
+function activeJsonHighlight(phase: ScenarioPhase): JsonHighlight | null {
+  if (phase === "select-parent") {
+    return "parent";
+  }
+
+  if (phase === "show-prompt") {
+    return "prompt";
+  }
+
+  if (phase === "write-json") {
+    return "patch";
+  }
+
+  if (phase === "create-children") {
+    return "children";
+  }
+
+  return null;
+}
+
+function JsonLine({
+  active,
+  children,
+  indent = 0,
+}: {
+  active?: boolean;
+  children: ReactNode;
+  indent?: number;
+}) {
+  return (
+    <span
+      className={`scenario-json-line ${active ? "is-active" : ""}`}
+      style={{ "--json-indent": indent } as CSSProperties}
+    >
+      {children}
+    </span>
+  );
+}
+
+function AgentJsonView({
+  phase,
+  state,
+}: {
+  phase: ScenarioPhase;
+  state: ReturnType<typeof buildAgentState>;
+}) {
+  const highlight = activeJsonHighlight(phase);
+  const firstChild = state.children[0];
+  const secondChild = state.children[1];
+
+  return (
+    <pre className="scenario-json">
+      <code>
+        <JsonLine>{"{"}</JsonLine>
+        <JsonLine active={highlight === "parent"} indent={1}>
+          {`"selected_parent": ${JSON.stringify(state.selected_parent)},`}
+        </JsonLine>
+        <JsonLine active={highlight === "prompt"} indent={1}>
+          {`"prompt_id": ${JSON.stringify(state.prompt_id)},`}
+        </JsonLine>
+        <JsonLine active={highlight === "prompt"} indent={1}>
+          {`"prompt": ${JSON.stringify(state.prompt)},`}
+        </JsonLine>
+        <JsonLine active={highlight === "patch"} indent={1}>
+          {`"patch_id": ${JSON.stringify(state.patch_id)},`}
+        </JsonLine>
+        <JsonLine active={highlight === "patch"} indent={1}>
+          {`"patch_status": ${JSON.stringify(state.patch_status)},`}
+        </JsonLine>
+        {state.operations.length > 0 ? (
+          <>
+            <JsonLine active={highlight === "patch"} indent={1}>
+              {'"operations": ['}
+            </JsonLine>
+            {state.operations.map((operation, index) => (
+              <JsonLine key={operation.path} active={highlight === "patch"} indent={2}>
+                {`${JSON.stringify(operation)}${index === state.operations.length - 1 ? "" : ","}`}
+              </JsonLine>
+            ))}
+            <JsonLine active={highlight === "patch"} indent={1}>
+              {"],"}
+            </JsonLine>
+          </>
+        ) : (
+          <JsonLine indent={1}>{'"operations": [],'}</JsonLine>
+        )}
+        {firstChild || secondChild ? (
+          <>
+            <JsonLine active={highlight === "children"} indent={1}>
+              {'"children": ['}
+            </JsonLine>
+            {firstChild ? (
+              <JsonLine active={highlight === "children"} indent={2}>
+                {`${JSON.stringify(firstChild)},`}
+              </JsonLine>
+            ) : null}
+            {secondChild ? (
+              <JsonLine active={highlight === "children"} indent={2}>
+                {JSON.stringify(secondChild)}
+              </JsonLine>
+            ) : null}
+            <JsonLine active={highlight === "children"} indent={1}>
+              {"]"}
+            </JsonLine>
+          </>
+        ) : (
+          <JsonLine indent={1}>{'"children": []'}</JsonLine>
+        )}
+        <JsonLine>{"}"}</JsonLine>
+      </code>
+    </pre>
+  );
+}
+
 function NodeMarker({
   node,
   active,
+  focus,
+  preview,
 }: {
   node: (typeof heroScenario.children)[number] | typeof heroScenario.parent;
   active: boolean;
+  focus?: boolean;
+  preview?: boolean;
 }) {
   return (
     <div
       className={`scenario-node ${node.kind === "parent" ? "scenario-parent-node" : "scenario-child-node"} ${
         active ? "is-active" : ""
-      }`}
+      } ${focus ? "is-focused" : ""} ${preview ? "is-preview" : ""}`}
       style={{ left: `${node.x}%`, top: `${node.y}%` }}
     >
       <span>{node.kind === "parent" ? "Parent" : "Child"}</span>
@@ -80,8 +214,12 @@ export function HeroScenarioPlayer({
   const phase = stepPhase(stepIndex);
   const agentState = useMemo(() => buildAgentState(phase), [phase]);
   const showPrompt = hasReached(phase, "show-prompt");
+  const showPatch = hasReached(phase, "write-json");
   const showChildren = hasReached(phase, "create-children");
   const selectedParent = hasReached(phase, "select-parent");
+  const focusParent = phase === "select-parent" || phase === "show-prompt";
+  const focusPatch = phase === "write-json";
+  const focusChildren = phase === "create-children";
   const currentStep = heroScenario.steps[stepIndex];
   const isComplete = stepIndex === heroScenario.steps.length - 1;
 
@@ -109,7 +247,7 @@ export function HeroScenarioPlayer({
         if (index === heroScenario.steps.length - 2) {
           setIsPlaying(false);
         }
-      }, (index + 1) * 620);
+      }, (index + 1) * STEP_DURATION_MS);
       timersRef.current.push(timer);
     });
   }
@@ -135,9 +273,7 @@ export function HeroScenarioPlayer({
             <p>{heroScenario.prompts[0].prompt}</p>
           </div>
         ) : null}
-        <pre>
-          <code>{JSON.stringify(agentState, null, 2)}</code>
-        </pre>
+        <AgentJsonView phase={phase} state={agentState} />
       </div>
 
       <div
@@ -154,14 +290,23 @@ export function HeroScenarioPlayer({
           className="compare-image"
         />
         <div className="scenario-visual-overlay">
-          <NodeMarker node={heroScenario.parent} active={selectedParent} />
-          {showChildren
-            ? heroScenario.children.map((child) => (
-                <NodeMarker key={child.id} node={child} active />
-              ))
-            : null}
-          {showChildren ? (
-            <svg className="scenario-connectors" viewBox="0 0 100 100" aria-hidden="true">
+          <NodeMarker
+            node={heroScenario.parent}
+            active={selectedParent}
+            focus={focusParent || focusPatch}
+          />
+          {showPatch ? (
+            <div
+              className={`scenario-agent-beam ${focusPatch ? "is-active" : ""}`}
+              aria-hidden="true"
+            />
+          ) : null}
+          {showPatch || showChildren ? (
+            <svg
+              className={`scenario-connectors ${showChildren ? "is-applied" : "is-queued"}`}
+              viewBox="0 0 100 100"
+              aria-hidden="true"
+            >
               {heroScenario.children.map((child) => (
                 <line
                   key={child.id}
@@ -173,6 +318,17 @@ export function HeroScenarioPlayer({
               ))}
             </svg>
           ) : null}
+          {showPatch || showChildren
+            ? heroScenario.children.map((child) => (
+                <NodeMarker
+                  key={child.id}
+                  node={child}
+                  active={showPatch || showChildren}
+                  focus={focusChildren}
+                  preview={showPatch && !showChildren}
+                />
+              ))
+            : null}
         </div>
       </div>
 

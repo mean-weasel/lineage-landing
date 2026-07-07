@@ -15,10 +15,21 @@ export type HeroPromptRecord = {
   prompt: string;
 };
 
+export type HeroAgentPatch = {
+  id: string;
+  label: string;
+  operations: Array<{
+    op: "add";
+    path: string;
+    assetId: string;
+  }>;
+};
+
 export type HeroScenarioStep =
   | { type: "idle"; label: string }
   | { type: "select-parent"; label: string; assetId: string }
   | { type: "show-prompt"; label: string; promptId: string }
+  | { type: "write-json"; label: string; patchId: string }
   | {
       type: "create-children";
       label: string;
@@ -30,6 +41,7 @@ export type HeroScenario = {
   parent: HeroAssetNode;
   children: HeroAssetNode[];
   prompts: HeroPromptRecord[];
+  patches: HeroAgentPatch[];
   steps: HeroScenarioStep[];
 };
 
@@ -48,6 +60,24 @@ export const heroScenario: HeroScenario = {
       label: "Recorded iteration prompt",
       prompt:
         "Create two follow-up Swissifier variations from the selected parent: one vertical poster composition and one root continuation preserving the typography treatment.",
+    },
+  ],
+  patches: [
+    {
+      id: "patch-swissifier-children-v1",
+      label: "Agent patch",
+      operations: [
+        {
+          op: "add",
+          path: "/children/0",
+          assetId: "local-befe299c503d",
+        },
+        {
+          op: "add",
+          path: "/children/1",
+          assetId: "local-2e102785131f",
+        },
+      ],
     },
   ],
   children: [
@@ -81,6 +111,11 @@ export const heroScenario: HeroScenario = {
       type: "show-prompt",
       label: "Prompt recorded",
       promptId: "prompt-swissifier-children-v1",
+    },
+    {
+      type: "write-json",
+      label: "JSON patch queued",
+      patchId: "patch-swissifier-children-v1",
     },
     {
       type: "create-children",
