@@ -55,3 +55,6 @@ next-env.d.ts
 
 # Local proof artifacts
 .asset-scratch/
+
+# GoalBuddy local board artifacts
+docs/goals/*/.goalbuddy-board/
