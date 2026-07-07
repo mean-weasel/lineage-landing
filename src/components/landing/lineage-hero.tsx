@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Code2, GitBranch, Image as ImageIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { HeroScenarioPlayer } from "@/components/landing/hero-scenario-player";
 import { GITHUB_REPO_URL } from "@/lib/links";
@@ -43,16 +43,6 @@ export function LineageHero() {
       </div>
 
       <div className="compare-shell" aria-label="Swissifier lineage visual and JSON comparison">
-        <div className="compare-toolbar">
-          <span>
-            <GitBranch aria-hidden="true" size={16} />
-            Real Swissifier lineage
-          </span>
-          <span>
-            {position < 50 ? <Code2 aria-hidden="true" size={16} /> : <ImageIcon aria-hidden="true" size={16} />}
-            {position < 50 ? "JSON tree view" : "Visual graph view"}
-          </span>
-        </div>
         <HeroScenarioPlayer position={position} onPositionChange={setPosition} />
       </div>
     </section>
