@@ -10,7 +10,7 @@ import {
   Play,
   RotateCcw,
 } from "lucide-react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { heroScenario, type HeroScenarioStep } from "@/lib/hero-scenario";
 
@@ -323,6 +323,8 @@ export function HeroScenarioPlayer({
   const [stepIndex, setStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const timersRef = useRef<number[]>([]);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
   const phase = stepPhase(stepIndex);
   const agentState = useMemo(() => buildAgentState(phase), [phase]);
   const currentPrompt = hasReached(phase, "prompt-iterate")
@@ -347,13 +349,8 @@ export function HeroScenarioPlayer({
   const iterationApplied = hasReached(phase, "apply-iteration");
   const currentStep = heroScenario.steps[stepIndex];
   const isComplete = stepIndex === heroScenario.steps.length - 1;
-  const modeLabel = position < 50 ? "Agent surface view" : "Visual graph view";
-  const modeIcon =
-    position < 50 ? (
-      <Code2 aria-hidden="true" size={16} />
-    ) : (
-      <ImageIcon aria-hidden="true" size={16} />
-    );
+  const modeLabel = "Visual + agent state";
+  const modeIcon = <MoveHorizontal aria-hidden="true" size={16} />;
 
   function clearTimers() {
     for (const timer of timersRef.current) {
@@ -390,6 +387,44 @@ export function HeroScenarioPlayer({
     setStepIndex(0);
   }
 
+  function updateComparePosition(clientX: number) {
+    const frame = frameRef.current;
+
+    if (!frame) {
+      return;
+    }
+
+    const rect = frame.getBoundingClientRect();
+    const nextPosition = ((clientX - rect.left) / rect.width) * 100;
+    onPositionChange(clamp(nextPosition, 0, 100));
+  }
+
+  function handleComparePointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) {
+      return;
+    }
+
+    isDraggingRef.current = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    updateComparePosition(event.clientX);
+  }
+
+  function handleComparePointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (!isDraggingRef.current) {
+      return;
+    }
+
+    updateComparePosition(event.clientX);
+  }
+
+  function handleComparePointerEnd(event: PointerEvent<HTMLDivElement>) {
+    isDraggingRef.current = false;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }
+
   useEffect(() => clearTimers, []);
 
   return (
@@ -420,7 +455,14 @@ export function HeroScenarioPlayer({
         </span>
       </div>
 
-      <div className="compare-frame">
+      <div
+        ref={frameRef}
+        className="compare-frame"
+        onPointerDown={handleComparePointerDown}
+        onPointerMove={handleComparePointerMove}
+        onPointerUp={handleComparePointerEnd}
+        onPointerCancel={handleComparePointerEnd}
+      >
       <div className="scenario-agent-surface" aria-hidden={position > 95}>
         <div className="scenario-agent-panel">
           <div
