@@ -256,7 +256,9 @@ h3 {
 }
 
 .compare-toolbar {
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
   gap: 12px;
   border-bottom: 1px solid #d8e2df;
   padding: 12px 14px;
@@ -270,6 +272,10 @@ h3 {
   align-items: center;
   gap: 8px;
   min-width: 0;
+}
+
+.compare-toolbar span:last-child {
+  justify-self: end;
 }
 
 .compare-frame {
@@ -301,16 +307,26 @@ h3 {
   overflow: hidden;
 }
 
-.scenario-agent-surface > * {
-  margin-left: 60%;
-  width: calc(40% - 24px);
+.scenario-agent-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: calc(40% + 10px);
+  padding: 18px 14px 18px 0;
+  overflow: hidden;
+}
+
+.scenario-agent-scroll {
+  transform: translateY(var(--agent-pan));
+  transition: transform 420ms ease;
 }
 
 .scenario-agent-header {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 0;
   margin-bottom: 12px;
   color: #9fd4c3;
   font-size: 0.76rem;
@@ -376,6 +392,17 @@ h3 {
 .scenario-visual-surface {
   z-index: 3;
   overflow: hidden;
+}
+
+.scenario-visual-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  transform: translateY(var(--visual-pan));
+  transform-origin: top left;
+  transition: transform 520ms ease;
 }
 
 .scenario-visual-overlay {
@@ -495,10 +522,7 @@ h3 {
 }
 
 .scenario-controls {
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  z-index: 12;
+  justify-self: center;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -507,7 +531,6 @@ h3 {
   padding: 7px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 12px 32px rgba(20, 32, 31, 0.18);
-  transform: translateX(-50%);
 }
 
 .scenario-controls span {
@@ -716,16 +739,20 @@ h3 {
 
   .compare-toolbar {
     align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+
+  .compare-toolbar span:last-child {
+    justify-self: start;
   }
 
   .compare-frame {
     min-height: 220px;
   }
 
-  .scenario-agent-surface > * {
-    margin-left: 60%;
-    width: calc(40% - 14px);
+  .scenario-agent-panel {
+    width: calc(40% + 4px);
+    padding: 12px 7px 12px 0;
   }
 
   .scenario-agent-header {
@@ -765,7 +792,7 @@ h3 {
   }
 
   .scenario-controls {
-    top: 8px;
+    justify-self: start;
     gap: 5px;
     padding: 5px;
   }
@@ -813,7 +840,9 @@ h3 {
   .scenario-json-line,
   .scenario-node,
   .scenario-connectors line,
-  .scenario-agent-beam {
+  .scenario-agent-beam,
+  .scenario-agent-scroll,
+  .scenario-visual-canvas {
     animation: none;
     transition: none;
   }

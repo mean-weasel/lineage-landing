@@ -1,0 +1,357 @@
+# GoalBuddy v2 state.yaml
+# Board truth lives here. goal.md is the editable charter; notes/ holds long receipts only.
+
+version: 2
+
+goal:
+  title: "Hero Surface Viewport Rework"
+  slug: "hero-surface-viewport-rework"
+  kind: existing_plan
+  tranche: "Repair PR #2 so the hero slider uses credible inspectable visual and agent surfaces with aligned markers, synchronized patch/child animation, reset, desktop/mobile proof, and no downstream landing content."
+  status: active
+  oracle:
+    signal: "Desktop and mobile browser walkthrough of the Lineage landing hero shows enough of the visual app canvas and agent JSON to make the parent selection, JSON patch, and child creation spatially credible; markers align to real screenshot/canvas targets; Play/Reset and scrubber work; no overflow/framework errors; npm run lint and npm run build pass."
+    cadence: "after each Worker package and at final audit"
+    final_proof: "Receipt-backed lint/build results, browser screenshots or walkthrough notes for desktop and mobile, scrubber proof, Play/Reset proof, marker-alignment proof, no-downstream-content proof, and an updated PR URL."
+  intake:
+    original_request: "Create a detailed GoalBuddy prep board to fix the hero animation issues around misaligned pointers and cramped slider surfaces."
+    interpreted_outcome: "Prepare a GoalBuddy board that will revise PR #2 into a credible inspectable hero slider with aligned visual markers and synchronized agent JSON behavior."
+    input_shape: existing_plan
+    audience: "Lineage landing page visitors and PR #2 reviewers"
+    authority: requested
+    proof_type: demo
+    completion_proof: "The active PR contains the reworked hero surface model with passing verification and browser proof on desktop/mobile."
+    likely_misfire: "Only tweaking overlay percentages or enlarging the frame without solving the screenshot coordinate/crop model and control placement."
+    blind_spots_considered:
+      - "The source app screenshot is much taller than the current 16:9 frame."
+      - "The current frame exposes only about 62% of the source screenshot height, based on prior browser geometry inspection."
+      - "Markers must map to underlying screenshot/canvas coordinates rather than the visible crop."
+      - "Manual scrolling inside the hero may be useful but should not become required to understand playback."
+      - "Auto-pan/center behavior may better communicate the scenario while preserving a polished hero."
+      - "Controls currently obscure screenshot/JSON content and may belong in the toolbar."
+      - "Mobile must stay readable with no horizontal overflow."
+      - "PR #2 is already open at https://github.com/mean-weasel/lineage-landing/pull/2."
+    existing_plan_facts:
+      - "Keep the landing page hero-only."
+      - "Preserve the visual/agent comparison slider."
+      - "Keep the scenario data-driven, recorded-prompt based, and resettable."
+      - "Current PR #2 adds a write-json phase, JSON line highlights, queued connectors, preview children, and reduced-motion CSS."
+      - "Independent review judged PR #2 structurally promising but visually not good enough yet."
+      - "Recommended direction: treat the compare frame as a viewport into larger surfaces, auto-pan to relevant regions during playback, center highlighted JSON lines, move controls out of content, and preserve scrubber behavior."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/hero-surface-viewport-rework/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.0/skills/goal-prep/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/hero-surface-viewport-rework"
+
+active_task: T005
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: low
+    objective: "Map the current PR #2 hero surface geometry, crop behavior, marker placement, and interaction constraints before implementation."
+    inputs:
+      - "src/components/landing/hero-scenario-player.tsx"
+      - "src/lib/hero-scenario.ts"
+      - "src/components/landing/lineage-hero.tsx"
+      - "src/app/globals.css"
+      - "public/swissifier-lineage-app.png"
+      - "public/swissifier-lineage-json.png"
+      - "PR #2: https://github.com/mean-weasel/lineage-landing/pull/2"
+      - "Current local page: http://lineage.localhost:3001/"
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation files."
+      - "Do not add new design direction beyond evidence-backed recommendations."
+      - "Use concrete browser geometry and screenshot evidence where practical."
+    expected_output:
+      - "Current crop/aspect-ratio map, including source screenshot dimensions and visible percentage."
+      - "Marker-to-target mismatch evidence."
+      - "Interaction conflict map for scrubber, manual scroll, auto-pan, and controls."
+      - "Mobile/desktop readability risks."
+      - "Candidate implementation models ranked by impact, complexity, and verification strength."
+    receipt:
+      result: done
+      task_id: T001
+      board_path: "/Users/neonwatty/Desktop/lineage-landing/docs/goals/hero-surface-viewport-rework/state.yaml"
+      summary: "Mapped current PR #2 hero geometry. The failure is structural: a 1440x1304 screenshot is forced into a 16:9 frame with object-fit cover, exposing only about 62.1% of the source height while marker x/y values are applied as cropped-frame percentages. Controls also overlap the content area, and mobile repeats the same crop/marker problem."
+      evidence:
+        - "public/swissifier-lineage-app.png and public/swissifier-lineage-json.png are both 1440x1304."
+        - "src/app/globals.css:276-286 sets .compare-frame to aspect-ratio 16 / 9 and .compare-image to object-fit: cover; object-position: left top."
+        - "src/components/landing/hero-scenario-player.tsx:195-200 applies marker left/top directly from scenario x/y percentages."
+        - "src/components/landing/hero-scenario-player.tsx:304-318 applies connector endpoints from the same frame percentages."
+        - "Desktop browser geometry: frame 1118x628.875, visible source height 810px, 62.1166% of source screenshot height."
+        - "Mobile browser geometry: frame 391.109x220, visible source height about 810px, 62.1168% of source screenshot height."
+        - "Desktop patch screenshot: /tmp/lineage-viewport-scout/desktop-patch.png"
+        - "Mobile patch screenshot: /tmp/lineage-viewport-scout/mobile-patch.png"
+      facts:
+        - "The current marker values are parent 29/39, child poster 43/72, and child drill 50/62 in scenario data."
+        - "Those values are reproduced exactly as frame percentages in desktop and mobile browser measurements."
+        - "Because the visible frame maps only the top 62.1% of the source screenshot height, frame-percent y positions do not correspond to source-image y positions."
+        - "The current Play/Reset controls overlap the frame on desktop and mobile; they sit in the screenshot/JSON content rather than in the toolbar."
+        - "The compare-range input covers the entire frame at z-index 8, so adding direct manual scroll inside the same frame would conflict unless the interaction layering is redesigned."
+        - "Mobile has no horizontal overflow and h2Count is 0, but the small 220px frame makes JSON and canvas state too cramped."
+      contradictions:
+        - "A percentage-only marker tweak would still be tied to the cropped frame rather than the real screenshot/canvas coordinate space."
+        - "Simply making the frame taller would expose more source image, but it would not by itself fix controls covering content or scrubber/manual-scroll event conflicts."
+      ambiguity_requiring_judge:
+        - "Whether the Worker should implement auto-panned larger inner surfaces only, manual scroll plus auto-pan, or a taller aspect-ratio frame with coordinate correction."
+        - "Whether PR #2 should continue using the existing screenshots or require a new dedicated hero screenshot/canvas capture."
+      candidate_models_ranked:
+        - model: "Coordinate-correct larger inner surfaces with playback auto-pan and controls moved to toolbar"
+          rank: 1
+          rationale: "Best matches the oracle: markers can be placed in source coordinates, playback can center relevant targets, scrubber remains the main comparison affordance, and users need not manually scroll to understand the flow."
+        - model: "Manual scrollable visual and agent panes inside the compare frame"
+          rank: 2
+          rationale: "Gives inspectability, but conflicts with full-frame scrubber input unless pointer-event and gesture ownership are redesigned; risks making the hero feel like a tiny embedded app."
+        - model: "Taller frame/aspect-ratio only"
+          rank: 3
+          rationale: "Improves crop but does not solve coordinate truth, control overlap, or agent JSON centering."
+        - model: "Percentage-only marker retune"
+          rank: 4
+          rationale: "Fastest but least truthful; Scout evidence contradicts it as a sufficient fix."
+      commands:
+        - cmd: "sips -g pixelWidth -g pixelHeight public/swissifier-lineage-app.png public/swissifier-lineage-json.png"
+          status: pass
+        - cmd: "Browser geometry measurement on http://lineage.localhost:3001/ for desktop 1280x720 and mobile 390x844"
+          status: pass
+      note_needed: false
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Choose the first safe rework model for the hero surfaces and specify the implementation package."
+    inputs:
+      - "T001 receipt"
+      - "docs/goals/hero-surface-viewport-rework/goal.md"
+    constraints:
+      - "Do not implement."
+      - "Reject percentage-only marker tweaks unless Scout proves they are sufficient."
+      - "Prefer one coherent vertical slice over many cosmetic fixes."
+      - "Keep PR #2 focused on hero-only behavior."
+    expected_output:
+      - "Decision: viewport/auto-pan model, manual scroll model, taller frame model, or other."
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+      - "Deferred polish or follow-up tasks."
+    receipt:
+      result: done
+      task_id: T002
+      board_path: "/Users/neonwatty/Desktop/lineage-landing/docs/goals/hero-surface-viewport-rework/state.yaml"
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Choose the coordinate-correct larger inner surface with playback auto-pan. Scout proved the bug is structural: markers are frame percentages over a cropped image. Manual scroll can be secondary later, but PR #2 needs an automatic, legible hero demo first. A taller frame or percent retune would leave key failure modes unresolved."
+      worker_package:
+        objective: "Implement a coordinate-correct hero viewport rework: move scenario controls out of the content frame, render visual and agent surfaces as larger inner canvases with phase-based auto-pan/centering, place markers/connectors in source-surface coordinates, preserve the scrubber, Play/Reset, reduced-motion behavior, and hero-only page."
+        allowed_files:
+          - "src/lib/hero-scenario.ts"
+          - "src/components/landing/hero-scenario-player.tsx"
+          - "src/components/landing/lineage-hero.tsx"
+          - "src/app/globals.css"
+        verify:
+          - "npm run lint"
+          - "npm run build"
+          - "Browser proof on desktop and mobile for marker alignment, auto-pan/centering, scrubber, Play, Reset, no downstream sections, no overflow, no visible framework overlay, and no console errors/warnings."
+        stop_if:
+          - "Need files outside allowed_files."
+          - "Need a new screenshot, generated asset, or source app capture."
+          - "Cannot preserve scrubber behavior while supporting the larger inner surfaces."
+          - "Marker alignment cannot be made credible from available screenshot/canvas evidence."
+          - "Verification fails twice."
+      evidence:
+        - "T001 measured both source screenshots at 1440x1304."
+        - "T001 measured current desktop and mobile frame mapping at only about 62.1% of source screenshot height."
+        - "T001 showed marker x/y values are applied directly as cropped-frame percentages."
+        - "T001 showed full-frame invisible range would conflict with manual scroll unless input layering is redesigned."
+      blocked_tasks: []
+      missing_evidence: []
+      required_board_updates:
+        - "Copy worker_package onto T003 and activate T003."
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Implement a coordinate-correct hero viewport rework: move scenario controls out of the content frame, render visual and agent surfaces as larger inner canvases with phase-based auto-pan/centering, place markers/connectors in source-surface coordinates, preserve the scrubber, Play/Reset, reduced-motion behavior, and hero-only page."
+    allowed_files:
+      - "src/lib/hero-scenario.ts"
+      - "src/components/landing/hero-scenario-player.tsx"
+      - "src/components/landing/lineage-hero.tsx"
+      - "src/app/globals.css"
+    verify:
+      - "npm run lint"
+      - "npm run build"
+      - "Browser proof on desktop and mobile for marker alignment, auto-pan/centering, scrubber, Play, Reset, no downstream sections, no overflow, no visible framework overlay, and no console errors/warnings."
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need a new screenshot or generated asset."
+      - "Cannot preserve scrubber behavior while supporting the larger inner surfaces."
+      - "Marker alignment cannot be proven from available screenshot/canvas evidence."
+      - "Verification fails twice."
+    receipt:
+      result: done
+      task_id: T003
+      board_path: "/Users/neonwatty/Desktop/lineage-landing/docs/goals/hero-surface-viewport-rework/state.yaml"
+      changed_files:
+        - "src/lib/hero-scenario.ts"
+        - "src/components/landing/hero-scenario-player.tsx"
+        - "src/components/landing/lineage-hero.tsx"
+        - "src/app/globals.css"
+      commands:
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "Browser proof on http://lineage.localhost:3001/: desktop source canvas height 1012.4 inside 628.9 frame; marker source coordinates measure back to scenario x/y; controls no longer overlap frame; Play patch/final states work; mobile 390x844 no overflow; Reset clears children/connectors; filtered console logs since fresh navigation empty."
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Implemented a coordinate-correct inner-surface rework. The visual side now uses a source-aspect canvas inside the fixed hero frame and auto-pans by scenario phase; markers/connectors measure in source coordinates. The agent surface now has a panned inner panel, and Play/Reset controls moved into the toolbar outside the content viewport."
+      deviations:
+        - "Manual user scrolling inside the hero was not added; the implemented model uses playback auto-pan to avoid fighting the scrubber input layer."
+        - "The slider handle remains on the compare boundary and can cover a small central area; it is part of the scrubber affordance rather than a separate playback control."
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+      evidence:
+        - "/tmp/lineage-viewport-worker/desktop-patch-v3.png"
+        - "/tmp/lineage-viewport-worker/desktop-final-v3.png"
+        - "/tmp/lineage-viewport-worker/mobile-patch-v2.png"
+        - "/tmp/lineage-viewport-worker/mobile-final-v2.png"
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Review the implemented hero surface rework for visual truthfulness, interaction clarity, simplicity, and mobile quality."
+    inputs:
+      - "T003 receipt"
+      - "Current diff"
+      - "Browser screenshots or walkthrough notes"
+      - "Verification outputs"
+    constraints:
+      - "Do not implement."
+      - "Reject if pointers still do not align to credible screenshot/canvas targets."
+      - "Reject if the crop still hides the necessary scenario area."
+      - "Reject if controls obscure the important state."
+      - "Reject if the landing page is no longer hero-only."
+    expected_output:
+      - "pass | needs_changes"
+      - "Findings with file references if needed."
+      - "Whether a follow-up Worker task is required."
+    receipt:
+      result: done
+      task_id: T004
+      board_path: "/Users/neonwatty/Desktop/lineage-landing/docs/goals/hero-surface-viewport-rework/state.yaml"
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Pass. The rework addresses the structural failure Scout identified: the screenshot now renders as a larger source-aspect canvas inside the hero viewport and auto-pans by phase, while marker measurements map back to source coordinates. Controls moved to the toolbar, and desktop/mobile checks show no overflow. PR update/final audit still remain."
+      worker_package:
+        objective: "Commit and push the hero surface rework and GoalBuddy board updates to PR #2, then verify the PR state."
+        allowed_files:
+          - "src/lib/hero-scenario.ts"
+          - "src/components/landing/hero-scenario-player.tsx"
+          - "src/components/landing/lineage-hero.tsx"
+          - "src/app/globals.css"
+          - "docs/goals/hero-surface-viewport-rework/state.yaml"
+          - "docs/goals/hero-surface-viewport-rework/goal.md"
+          - "docs/goals/hero-surface-viewport-rework/notes/.gitkeep"
+        verify:
+          - "git status --short"
+          - "gh pr view 2"
+        stop_if:
+          - "Need credentials or repository permissions not available locally."
+          - "PR #2 is closed or points to a different head branch."
+      evidence:
+        - "T003 lint/build passed."
+        - "Desktop source-coordinate proof: parent source y 38.999, child poster source y 71.999, child drill source y 62.000; controlsOverlapFrame false."
+        - "Mobile source-coordinate proof: parent source y 38.997, child poster source y 71.998, child drill source y 61.996; controlsOverlapFrame false; no overflow."
+        - "Reset proof: childNodes 0, connectors 0, patch_id null, children [] after Reset."
+      blocked_tasks: []
+      missing_evidence: []
+      required_board_updates:
+        - "Copy worker_package onto T005 and activate T005."
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: active
+    reasoning_hint: medium
+    objective: "Commit and push the hero surface rework and GoalBuddy board updates to PR #2, then verify the PR state."
+    allowed_files:
+      - "src/lib/hero-scenario.ts"
+      - "src/components/landing/hero-scenario-player.tsx"
+      - "src/components/landing/lineage-hero.tsx"
+      - "src/app/globals.css"
+      - "docs/goals/hero-surface-viewport-rework/state.yaml"
+      - "docs/goals/hero-surface-viewport-rework/goal.md"
+      - "docs/goals/hero-surface-viewport-rework/notes/.gitkeep"
+    verify:
+      - "git status --short"
+      - "gh pr view 2"
+    stop_if:
+      - "Need credentials or repository permissions not available locally."
+      - "PR #2 is closed or points to a different head branch."
+    receipt: null
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: queued
+    reasoning_hint: high
+    objective: "Audit whether the revised PR satisfies the original user outcome for this tranche."
+    inputs:
+      - "All done task receipts"
+      - "Last verification"
+      - "Current dirty diff"
+      - "PR URL"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if required Worker work is still queued or active."
+      - "Reject completion if no updated PR URL exists."
+      - "Reject completion if marker alignment, crop/viewport behavior, scrubber behavior, Play/Reset, or mobile proof is missing."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "missing evidence"
+      - "next task if not complete"
+    receipt: null
+
+checks:
+  dirty_fingerprint: "At prep time, branch codex/hero-scenario-animation exists and PR #2 is open; no uncommitted implementation changes were present."
+  last_verification:
+    result: unknown
+    task: null
+    commands: []

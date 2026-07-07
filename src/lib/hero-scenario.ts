@@ -25,6 +25,11 @@ export type HeroAgentPatch = {
   }>;
 };
 
+export type HeroScenarioSurface = {
+  width: number;
+  height: number;
+};
+
 export type HeroScenarioStep =
   | { type: "idle"; label: string }
   | { type: "select-parent"; label: string; assetId: string }
@@ -38,6 +43,7 @@ export type HeroScenarioStep =
     };
 
 export type HeroScenario = {
+  surface: HeroScenarioSurface;
   parent: HeroAssetNode;
   children: HeroAssetNode[];
   prompts: HeroPromptRecord[];
@@ -46,6 +52,10 @@ export type HeroScenario = {
 };
 
 export const heroScenario: HeroScenario = {
+  surface: {
+    width: 1440,
+    height: 1304,
+  },
   parent: {
     id: "local-5748fb8ba6df",
     title: "swissifier linkedin root v1",

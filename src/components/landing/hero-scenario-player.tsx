@@ -3,6 +3,7 @@
 import Image from "next/image";
 import {
   Code2,
+  GitBranch,
   GripVertical,
   Image as ImageIcon,
   MoveHorizontal,
@@ -21,6 +22,15 @@ type HeroScenarioPlayerProps = {
 type ScenarioPhase = HeroScenarioStep["type"];
 type JsonHighlight = "parent" | "prompt" | "patch" | "children";
 const STEP_DURATION_MS = 880;
+const HERO_FRAME_ASPECT = 16 / 9;
+const SOURCE_ASPECT = heroScenario.surface.width / heroScenario.surface.height;
+const SOURCE_VISIBLE_HEIGHT_PERCENT = (SOURCE_ASPECT / HERO_FRAME_ASPECT) * 100;
+const SOURCE_CENTER_Y_PERCENT = SOURCE_VISIBLE_HEIGHT_PERCENT / 2;
+const SOURCE_MAX_PAN_PERCENT = 100 - SOURCE_VISIBLE_HEIGHT_PERCENT;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
 
 function stepPhase(stepIndex: number): ScenarioPhase {
   return heroScenario.steps[stepIndex]?.type ?? "idle";
@@ -84,6 +94,42 @@ function activeJsonHighlight(phase: ScenarioPhase): JsonHighlight | null {
   }
 
   return null;
+}
+
+function visualFocusY(phase: ScenarioPhase) {
+  if (phase === "write-json") {
+    return 56;
+  }
+
+  if (phase === "create-children") {
+    return 66;
+  }
+
+  if (phase === "select-parent" || phase === "show-prompt") {
+    return heroScenario.parent.y;
+  }
+
+  return 34;
+}
+
+function visualPanPercent(phase: ScenarioPhase) {
+  return clamp(
+    SOURCE_CENTER_Y_PERCENT - visualFocusY(phase),
+    -SOURCE_MAX_PAN_PERCENT,
+    0,
+  );
+}
+
+function agentPan(phase: ScenarioPhase) {
+  if (phase === "create-children") {
+    return "-84px";
+  }
+
+  if (phase === "write-json") {
+    return "-44px";
+  }
+
+  return "0px";
 }
 
 function JsonLine({
@@ -222,6 +268,13 @@ export function HeroScenarioPlayer({
   const focusChildren = phase === "create-children";
   const currentStep = heroScenario.steps[stepIndex];
   const isComplete = stepIndex === heroScenario.steps.length - 1;
+  const modeLabel = position < 50 ? "Agent surface view" : "Visual graph view";
+  const modeIcon =
+    position < 50 ? (
+      <Code2 aria-hidden="true" size={16} />
+    ) : (
+      <ImageIcon aria-hidden="true" size={16} />
+    );
 
   function clearTimers() {
     for (const timer of timersRef.current) {
@@ -261,19 +314,53 @@ export function HeroScenarioPlayer({
   useEffect(() => clearTimers, []);
 
   return (
-    <div className="compare-frame">
-      <div className="scenario-agent-surface" aria-hidden={position > 95}>
-        <div className="scenario-agent-header">
-          <Code2 aria-hidden="true" size={15} />
-          Agent state
+    <>
+      <div className="compare-toolbar">
+        <span>
+          <GitBranch aria-hidden="true" size={16} />
+          Real Swissifier lineage
+        </span>
+        <div className="scenario-controls" aria-label="Scenario playback controls">
+          <span>{currentStep.label}</span>
+          <button
+            type="button"
+            onClick={playScenario}
+            disabled={isPlaying || isComplete}
+          >
+            <Play aria-hidden="true" size={14} />
+            Play
+          </button>
+          <button type="button" onClick={resetScenario}>
+            <RotateCcw aria-hidden="true" size={14} />
+            Reset
+          </button>
         </div>
-        {showPrompt ? (
-          <div className="scenario-prompt">
-            <span>{heroScenario.prompts[0].label}</span>
-            <p>{heroScenario.prompts[0].prompt}</p>
+        <span>
+          {modeIcon}
+          {modeLabel}
+        </span>
+      </div>
+
+      <div className="compare-frame">
+      <div className="scenario-agent-surface" aria-hidden={position > 95}>
+        <div className="scenario-agent-panel">
+          <div
+            className="scenario-agent-scroll"
+            style={{ "--agent-pan": agentPan(phase) } as CSSProperties}
+          >
+            <div className="scenario-agent-header">
+              <Code2 aria-hidden="true" size={15} />
+              Agent state
+            </div>
+            {showPrompt ? (
+              <div className="scenario-prompt">
+                <span>{heroScenario.prompts[0].label}</span>
+                <p>{heroScenario.prompts[0].prompt}</p>
+              </div>
+            ) : null}
+            <AgentJsonView phase={phase} state={agentState} />
           </div>
-        ) : null}
-        <AgentJsonView phase={phase} state={agentState} />
+        </div>
       </div>
 
       <div
@@ -281,54 +368,64 @@ export function HeroScenarioPlayer({
         style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
         aria-hidden={position < 5}
       >
-        <Image
-          src="/swissifier-lineage-app.png"
-          alt="Lineage app screenshot showing the Swissifier image seed graph"
-          fill
-          priority
-          sizes="(max-width: 900px) 100vw, 1040px"
-          className="compare-image"
-        />
-        <div className="scenario-visual-overlay">
-          <NodeMarker
-            node={heroScenario.parent}
-            active={selectedParent}
-            focus={focusParent || focusPatch}
+        <div
+          className="scenario-visual-canvas"
+          style={
+            {
+              "--visual-pan": `${visualPanPercent(phase)}%`,
+              aspectRatio: `${heroScenario.surface.width} / ${heroScenario.surface.height}`,
+            } as CSSProperties
+          }
+        >
+          <Image
+            src="/swissifier-lineage-app.png"
+            alt="Lineage app screenshot showing the Swissifier image seed graph"
+            fill
+            priority
+            sizes="(max-width: 900px) 100vw, 1040px"
+            className="compare-image"
           />
-          {showPatch ? (
-            <div
-              className={`scenario-agent-beam ${focusPatch ? "is-active" : ""}`}
-              aria-hidden="true"
+          <div className="scenario-visual-overlay">
+            <NodeMarker
+              node={heroScenario.parent}
+              active={selectedParent}
+              focus={focusParent || focusPatch}
             />
-          ) : null}
-          {showPatch || showChildren ? (
-            <svg
-              className={`scenario-connectors ${showChildren ? "is-applied" : "is-queued"}`}
-              viewBox="0 0 100 100"
-              aria-hidden="true"
-            >
-              {heroScenario.children.map((child) => (
-                <line
-                  key={child.id}
-                  x1={heroScenario.parent.x}
-                  y1={heroScenario.parent.y}
-                  x2={child.x}
-                  y2={child.y}
-                />
-              ))}
-            </svg>
-          ) : null}
-          {showPatch || showChildren
-            ? heroScenario.children.map((child) => (
-                <NodeMarker
-                  key={child.id}
-                  node={child}
-                  active={showPatch || showChildren}
-                  focus={focusChildren}
-                  preview={showPatch && !showChildren}
-                />
-              ))
-            : null}
+            {showPatch ? (
+              <div
+                className={`scenario-agent-beam ${focusPatch ? "is-active" : ""}`}
+                aria-hidden="true"
+              />
+            ) : null}
+            {showPatch || showChildren ? (
+              <svg
+                className={`scenario-connectors ${showChildren ? "is-applied" : "is-queued"}`}
+                viewBox="0 0 100 100"
+                aria-hidden="true"
+              >
+                {heroScenario.children.map((child) => (
+                  <line
+                    key={child.id}
+                    x1={heroScenario.parent.x}
+                    y1={heroScenario.parent.y}
+                    x2={child.x}
+                    y2={child.y}
+                  />
+                ))}
+              </svg>
+            ) : null}
+            {showPatch || showChildren
+              ? heroScenario.children.map((child) => (
+                  <NodeMarker
+                    key={child.id}
+                    node={child}
+                    active={showPatch || showChildren}
+                    focus={focusChildren}
+                    preview={showPatch && !showChildren}
+                  />
+                ))
+              : null}
+          </div>
         </div>
       </div>
 
@@ -348,22 +445,6 @@ export function HeroScenarioPlayer({
         </div>
       </div>
 
-      <div className="scenario-controls" aria-label="Scenario playback controls">
-        <span>{currentStep.label}</span>
-        <button
-          type="button"
-          onClick={playScenario}
-          disabled={isPlaying || isComplete}
-        >
-          <Play aria-hidden="true" size={14} />
-          Play
-        </button>
-        <button type="button" onClick={resetScenario}>
-          <RotateCcw aria-hidden="true" size={14} />
-          Reset
-        </button>
-      </div>
-
       <div className="compare-badge compare-badge-left">
         <ImageIcon aria-hidden="true" size={14} />
         <span className="badge-full">Design surface</span>
@@ -375,5 +456,6 @@ export function HeroScenarioPlayer({
         <span className="badge-short">Agent</span>
       </div>
     </div>
+    </>
   );
 }
