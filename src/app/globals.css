@@ -107,9 +107,6 @@ a {
 .primary-action,
 .secondary-action,
 .compare-toolbar,
-.compare-control,
-.start-actions,
-.terminal-title,
 .footer-links {
   display: flex;
   align-items: center;
@@ -206,8 +203,7 @@ h3 {
 }
 
 .hero-lede,
-.section-heading p,
-.surface-panel p {
+.compare-badge {
   color: #4f605c;
   font-size: 1.14rem;
 }
@@ -282,6 +278,7 @@ h3 {
   min-height: 300px;
   overflow: hidden;
   background: #111817;
+  cursor: ew-resize;
 }
 
 .compare-image {
@@ -300,184 +297,69 @@ h3 {
   top: 0;
   bottom: 0;
   width: 2px;
+  z-index: 5;
   background: #ffffff;
   box-shadow: 0 0 0 1px rgba(20, 32, 31, 0.34), 0 0 22px rgba(20, 32, 31, 0.3);
+  pointer-events: none;
 }
 
-.compare-divider::after {
+.compare-tab {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 36px;
-  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 58px;
+  height: 42px;
   border: 1px solid rgba(20, 32, 31, 0.18);
-  border-radius: 999px;
+  border-radius: 8px;
   background: #ffffff;
+  color: #14201f;
   box-shadow: 0 8px 22px rgba(20, 32, 31, 0.22);
-  content: "";
   transform: translate(-50%, -50%);
 }
 
-.compare-control {
-  justify-content: space-between;
-  gap: 14px;
-  padding: 13px 14px 15px;
-  color: #50615d;
-  font-size: 0.82rem;
-  font-weight: 750;
-}
-
-.compare-control input {
-  width: min(560px, 100%);
-  accent-color: #1f8f73;
-}
-
-.section-band {
-  padding: 58px 0;
-  border-top: 1px solid #d7e2df;
-}
-
-.section-heading {
-  max-width: 760px;
-  margin-bottom: 28px;
-}
-
-.workflow-rail {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  overflow: hidden;
-  border: 1px solid #cbd8d4;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.workflow-step {
-  position: relative;
-  min-height: 270px;
-  border-right: 1px solid #d7e2df;
-  padding: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(245, 248, 247, 0.72));
-}
-
-.workflow-step:last-child {
-  border-right: 0;
-}
-
-.workflow-step svg,
-.surface-panel svg {
-  margin-bottom: 18px;
-  color: #1f8f73;
-}
-
-.step-index {
-  display: block;
-  margin-bottom: 32px;
-  color: #9aa9a5;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.workflow-step p {
-  color: #5b6b67;
-}
-
-.split-section {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(300px, 1fr);
-  gap: 34px;
-  align-items: start;
-  padding: 58px 0;
-  border-top: 1px solid #d7e2df;
-}
-
-.split-section > div > p {
-  max-width: 520px;
-  color: #5b6b67;
-  font-size: 1.06rem;
-}
-
-.surface-panel {
-  border: 1px solid #cbd8d4;
-  border-radius: 8px;
-  padding: 24px;
-  background: #ffffff;
-}
-
-.surface-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 22px;
-}
-
-.surface-list span {
-  border: 1px solid #d7e2df;
-  border-radius: 999px;
-  padding: 7px 10px;
-  background: #f5f8f7;
-  color: #344541;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.start-section {
-  display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1fr);
-  gap: 34px;
-  align-items: stretch;
-  border-top: 1px solid #d7e2df;
-  padding: 58px 0 40px;
-}
-
-.start-copy {
-  align-self: center;
-}
-
-.start-copy p {
-  max-width: 560px;
-  color: #5b6b67;
-  font-size: 1.08rem;
-}
-
-.start-actions {
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.terminal-panel {
-  overflow: hidden;
-  border: 1px solid #14201f;
-  border-radius: 8px;
-  background: #111817;
-  color: #e9f3ef;
-  box-shadow: 0 24px 70px rgba(20, 32, 31, 0.16);
-}
-
-.terminal-title {
-  gap: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 13px 15px;
-  color: #a7bab5;
-  font-size: 0.78rem;
-  font-weight: 760;
-  text-transform: uppercase;
-}
-
-.terminal-panel pre {
+.compare-range {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
   margin: 0;
-  padding: 22px;
-  overflow-x: auto;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  line-height: 1.85;
-  white-space: pre;
+  cursor: ew-resize;
+  opacity: 0;
 }
 
-.terminal-panel code {
-  font-family: inherit;
-  color: #d9fff2;
+.compare-badge {
+  position: absolute;
+  bottom: 14px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(20, 32, 31, 0.12);
+  border-radius: 8px;
+  padding: 7px 9px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #344541;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.compare-badge-left {
+  left: 14px;
+}
+
+.compare-badge-right {
+  right: 14px;
+}
+
+.badge-short {
+  display: none;
 }
 
 .site-footer {
@@ -512,15 +394,19 @@ h3 {
     width: min(100% - 28px, 1120px);
   }
 
-  .site-nav,
   .site-footer {
     align-items: flex-start;
     flex-direction: column;
   }
 
+  .site-nav {
+    align-items: center;
+    flex-direction: row;
+  }
+
   .nav-links {
-    width: 100%;
-    justify-content: space-between;
+    width: auto;
+    justify-content: flex-end;
   }
 
   .hero-section {
@@ -535,14 +421,11 @@ h3 {
     font-size: 1.85rem;
   }
 
-  .hero-lede,
-  .section-heading p,
-  .surface-panel p {
+  .hero-lede {
     font-size: 1rem;
   }
 
-  .compare-toolbar,
-  .compare-control {
+  .compare-toolbar {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -551,30 +434,28 @@ h3 {
     min-height: 220px;
   }
 
-  .workflow-rail,
-  .split-section,
-  .start-section {
-    grid-template-columns: 1fr;
+  .compare-tab {
+    width: 48px;
+    height: 38px;
   }
 
-  .workflow-step {
-    min-height: 0;
-    border-right: 0;
-    border-bottom: 1px solid #d7e2df;
+  .compare-badge {
+    bottom: 10px;
+    gap: 5px;
+    padding: 6px 7px;
+    font-size: 0.62rem;
   }
 
-  .workflow-step:last-child {
-    border-bottom: 0;
+  .badge-full {
+    display: none;
   }
 
-  .step-index {
-    margin-bottom: 18px;
+  .badge-short {
+    display: inline;
   }
 
-  .terminal-panel pre {
-    font-size: 0.76rem;
-    white-space: pre-wrap;
-    word-break: break-word;
+  .compare-badge-right {
+    right: 42px;
   }
 
   .footer-links {

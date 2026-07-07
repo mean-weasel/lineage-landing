@@ -10,8 +10,6 @@ export function Nav() {
         Lineage
       </Link>
       <div className="nav-links">
-        <Link href="/#workflow">How it works</Link>
-        <Link href="/#start">Start</Link>
         <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" className="nav-cta">
           <Code2 aria-hidden="true" size={16} />
           GitHub

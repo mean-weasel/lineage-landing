@@ -1,7 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Code2, GitBranch, Image as ImageIcon } from "lucide-react";
+import {
+  ArrowRight,
+  Code2,
+  GitBranch,
+  GripVertical,
+  Image as ImageIcon,
+  MoveHorizontal,
+} from "lucide-react";
 import { useState } from "react";
 import { GITHUB_REPO_URL } from "@/lib/links";
 
@@ -30,12 +37,14 @@ export function LineageHero() {
             <ArrowRight aria-hidden="true" size={18} />
           </a>
           <a
-            href="#start"
-            data-analytics-event="hero_start_click"
-            data-analytics-label="Start locally"
+            href="/swissifier-lineage-tree.json"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-analytics-event="hero_json_click"
+            data-analytics-label="Open JSON tree"
             className="secondary-action"
           >
-            Start locally
+            Open JSON tree
           </a>
         </div>
       </div>
@@ -73,11 +82,8 @@ export function LineageHero() {
               className="compare-image"
             />
           </div>
-          <div className="compare-divider" style={{ left: `${position}%` }} aria-hidden="true" />
-        </div>
-        <div className="compare-control">
-          <span>Design surface</span>
           <input
+            className="compare-range"
             aria-label="Compare visual lineage graph with JSON lineage tree"
             type="range"
             min="0"
@@ -85,7 +91,22 @@ export function LineageHero() {
             value={position}
             onChange={(event) => setPosition(Number(event.target.value))}
           />
-          <span>Agent JSON</span>
+          <div className="compare-divider" style={{ left: `${position}%` }} aria-hidden="true">
+            <div className="compare-tab">
+              <MoveHorizontal aria-hidden="true" size={18} />
+              <GripVertical aria-hidden="true" size={16} />
+            </div>
+          </div>
+          <div className="compare-badge compare-badge-left">
+            <ImageIcon aria-hidden="true" size={14} />
+            <span className="badge-full">Design surface</span>
+            <span className="badge-short">Design</span>
+          </div>
+          <div className="compare-badge compare-badge-right">
+            <Code2 aria-hidden="true" size={14} />
+            <span className="badge-full">Agent surface</span>
+            <span className="badge-short">Agent</span>
+          </div>
         </div>
       </div>
     </section>
