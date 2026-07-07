@@ -1,0 +1,239 @@
+{
+  "schema_version": "lineage.visual_handoff.v1",
+  "project": "demo-project",
+  "workspace": {
+    "id": "swissifier-rich-demo",
+    "title": "Swissifier rich demo",
+    "root_asset_id": "local-5748fb8ba6df",
+    "selected_next_bases": [
+      "local-27050bc5c393",
+      "local-6d06bdbd9f56"
+    ],
+    "asset_count": 14,
+    "edge_count": 13
+  },
+  "nodes": [
+    {
+      "asset_id": "local-5748fb8ba6df",
+      "title": "swissifier linkedin root v1",
+      "file": "swissifier-linkedin-root-v1.png",
+      "channel": "linkedin",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 40,
+        "y": 894
+      }
+    },
+    {
+      "asset_id": "local-befe299c503d",
+      "title": "swissifier vertical poster v1",
+      "file": "swissifier-vertical-poster-v1.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 362,
+        "y": 1382
+      }
+    },
+    {
+      "asset_id": "local-2e102785131f",
+      "title": "swissifier vertical drill v1",
+      "file": "swissifier-vertical-drill-v1.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 362,
+        "y": 894
+      }
+    },
+    {
+      "asset_id": "local-27050bc5c393",
+      "title": "swissifier vertical before after v1",
+      "file": "swissifier-vertical-before-after-v1.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": true,
+      "position": {
+        "x": 362,
+        "y": 284
+      }
+    },
+    {
+      "asset_id": "local-cce63eed23a3",
+      "title": "swissifier poster bauhaus grid v2",
+      "file": "swissifier-poster-bauhaus-grid-v2.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 684,
+        "y": 1504
+      }
+    },
+    {
+      "asset_id": "local-425b87091830",
+      "title": "swissifier poster pastel circles v2",
+      "file": "swissifier-poster-pastel-circles-v2.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 684,
+        "y": 1260
+      }
+    },
+    {
+      "asset_id": "local-50301c939ad8",
+      "title": "swissifier drill color grid v2",
+      "file": "swissifier-drill-color-grid-v2.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 684,
+        "y": 1016
+      }
+    },
+    {
+      "asset_id": "local-6d06bdbd9f56",
+      "title": "swissifier drill mint diagonal v2",
+      "file": "swissifier-drill-mint-diagonal-v2.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": true,
+      "position": {
+        "x": 684,
+        "y": 772
+      }
+    },
+    {
+      "asset_id": "local-d49cb3a68453",
+      "title": "swissifier before after space poster v3",
+      "file": "swissifier-before-after-space-poster-v3.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 684,
+        "y": 40
+      }
+    },
+    {
+      "asset_id": "local-111fceddec13",
+      "title": "swissifier before after cosmic portal v3",
+      "file": "swissifier-before-after-cosmic-portal-v3.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 684,
+        "y": 528
+      }
+    },
+    {
+      "asset_id": "local-5f51b8356e70",
+      "title": "swissifier before after alien lab v3",
+      "file": "swissifier-before-after-alien-lab-v3.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 684,
+        "y": 284
+      }
+    },
+    {
+      "asset_id": "local-463b433de01a",
+      "title": "swissifier drill cosmic blueprint v3",
+      "file": "swissifier-drill-cosmic-blueprint-v3.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 1006,
+        "y": 528
+      }
+    },
+    {
+      "asset_id": "local-4f2733e9ff40",
+      "title": "swissifier drill asteroid tool v3",
+      "file": "swissifier-drill-asteroid-tool-v3.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 1006,
+        "y": 1016
+      }
+    },
+    {
+      "asset_id": "local-0f885a18d5ce",
+      "title": "swissifier drill blacklight v3",
+      "file": "swissifier-drill-blacklight-v3.png",
+      "channel": "local",
+      "status": "planned",
+      "selected_for_next_variation": false,
+      "position": {
+        "x": 1006,
+        "y": 772
+      }
+    }
+  ],
+  "edges": [
+    {
+      "parent_asset_id": "local-5748fb8ba6df",
+      "child_asset_id": "local-befe299c503d"
+    },
+    {
+      "parent_asset_id": "local-5748fb8ba6df",
+      "child_asset_id": "local-2e102785131f"
+    },
+    {
+      "parent_asset_id": "local-5748fb8ba6df",
+      "child_asset_id": "local-27050bc5c393"
+    },
+    {
+      "parent_asset_id": "local-befe299c503d",
+      "child_asset_id": "local-cce63eed23a3"
+    },
+    {
+      "parent_asset_id": "local-befe299c503d",
+      "child_asset_id": "local-425b87091830"
+    },
+    {
+      "parent_asset_id": "local-2e102785131f",
+      "child_asset_id": "local-50301c939ad8"
+    },
+    {
+      "parent_asset_id": "local-2e102785131f",
+      "child_asset_id": "local-6d06bdbd9f56"
+    },
+    {
+      "parent_asset_id": "local-27050bc5c393",
+      "child_asset_id": "local-111fceddec13"
+    },
+    {
+      "parent_asset_id": "local-27050bc5c393",
+      "child_asset_id": "local-5f51b8356e70"
+    },
+    {
+      "parent_asset_id": "local-27050bc5c393",
+      "child_asset_id": "local-d49cb3a68453"
+    },
+    {
+      "parent_asset_id": "local-6d06bdbd9f56",
+      "child_asset_id": "local-4f2733e9ff40"
+    },
+    {
+      "parent_asset_id": "local-6d06bdbd9f56",
+      "child_asset_id": "local-0f885a18d5ce"
+    },
+    {
+      "parent_asset_id": "local-6d06bdbd9f56",
+      "child_asset_id": "local-463b433de01a"
+    }
+  ]
+}
