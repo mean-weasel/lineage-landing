@@ -11,11 +11,11 @@ export function LineageHero() {
   return (
     <section className="hero-section" aria-labelledby="hero-title">
       <div className="hero-copy">
-        <p className="eyebrow">Lineage for generated design work</p>
         <h1 id="hero-title">The design UX for human and agent collaboration.</h1>
         <p className="hero-lede">
-          Move between a visual lineage graph humans can review and the JSON tree
-          agents can continue from. Same artifact history, two collaboration surfaces.
+          Visual lineage for humans. JSON continuity for agents. Lineage turns
+          generated design work into a shared record that people can inspect and
+          agents can continue.
         </p>
         <div className="hero-actions">
           <a
@@ -30,12 +30,12 @@ export function LineageHero() {
             <ArrowRight aria-hidden="true" size={18} />
           </a>
           <a
-            href="#workflow"
-            data-analytics-event="hero_workflow_click"
-            data-analytics-label="See the workflow"
+            href="#start"
+            data-analytics-event="hero_start_click"
+            data-analytics-label="Start locally"
             className="secondary-action"
           >
-            See the workflow
+            Start locally
           </a>
         </div>
       </div>
@@ -44,7 +44,7 @@ export function LineageHero() {
         <div className="compare-toolbar">
           <span>
             <GitBranch aria-hidden="true" size={16} />
-            Swissifier lineage seed graph
+            Real Swissifier lineage
           </span>
           <span>
             {position < 50 ? <Code2 aria-hidden="true" size={16} /> : <ImageIcon aria-hidden="true" size={16} />}
