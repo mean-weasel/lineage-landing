@@ -8,7 +8,7 @@ goal:
   slug: "hero-scenario-player"
   kind: existing_plan
   tranche: "Deliver PR 1 for a simple data-driven Lineage hero scenario player with parent selection, recorded prompt, child creation, synchronized agent/JSON state, reset, verification, and PR creation."
-  status: active
+  status: done
   oracle:
     signal: "Desktop and mobile browser walkthrough of the Lineage landing hero shows the in-image scrubber still working, parent selection, recorded prompt, two child nodes appearing, synchronized agent/JSON update, reset removing child nodes, no downstream content, and passing npm run lint plus npm run build."
     cadence: "after each Worker package and at final audit"
@@ -71,7 +71,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/hero-scenario-player/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.0/skills/goal-prep/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/hero-scenario-player"
 
-active_task: T005
+active_task: null
 
 tasks:
   - id: T001
@@ -245,7 +245,7 @@ tasks:
   - id: T005
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Address any Judge-required fixes from T004, then create and push the PR branch."
     allowed_files:
@@ -260,11 +260,26 @@ tasks:
       - "No Judge findings or branch/PR work is needed."
       - "Need credentials or repository permissions not available locally."
       - "Fixes require expanding scope beyond PR 1."
-    receipt: null
+    receipt:
+      result: done
+      changed_files:
+        - ".gitignore"
+        - "docs/goals/hero-scenario-player/state.yaml"
+        - "docs/goals/hero-scenario-player/goal.md"
+        - "docs/goals/hero-scenario-player/notes/.gitkeep"
+      commands:
+        - cmd: "git commit -m \"Add hero scenario player\""
+          status: pass
+        - cmd: "git push -u origin codex/hero-scenario-player"
+          status: pass
+        - cmd: "gh pr create --base main --head codex/hero-scenario-player --title \"Add hero scenario player\""
+          status: pass
+      pr_url: "https://github.com/mean-weasel/lineage-landing/pull/1"
+      summary: "Committed the implementation and GoalBuddy records, pushed codex/hero-scenario-player, created PR #1, and excluded generated local GoalBuddy board assets from the branch."
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Audit whether the hero scenario player PR satisfies the original user outcome for this tranche."
     inputs:
@@ -282,7 +297,27 @@ tasks:
       - "full_outcome_complete: true | false"
       - "missing evidence"
       - "next task if not complete"
-    receipt: null
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      user_facing_claim: "PR #1 contains a first repeatable hero scenario player for the Lineage landing page: parent selection, recorded prompt, two child nodes, synchronized agent JSON, reset, preserved in-image scrubber, and hero-only page."
+      top_failure_modes:
+        - failure: "The demo is not repeatable or data-driven."
+          evidence: "src/lib/hero-scenario.ts defines the parent, prompt, children, and ordered steps; src/components/landing/hero-scenario-player.tsx derives both visual overlays and JSON from that state."
+        - failure: "Reset only hides UI instead of removing child state."
+          evidence: "Reset clears timers/isPlaying and returns stepIndex to 0; Playwright proof observed childNodes 0, prompt hidden, and JSON children [] after Reset."
+        - failure: "The landing page drifted beyond the requested hero-only scope."
+          evidence: "src/app/page.tsx renders only LineageHero; stale downstream-section scan found no workflow/how-it-works/start sections in page/components."
+      evidence:
+        - "npm run lint passed."
+        - "npm run build passed."
+        - "Playwright proof on http://lineage.localhost:3001 passed for desktop/mobile scrubber movement, Play, Reset, h2Count 0, and no overflow."
+        - "Proof screenshots: .asset-scratch/proof-hero-scenario-player-final/desktop-played.png and mobile-played.png."
+        - "GoalBuddy checker passed with T999 active before final completion."
+        - "PR open: https://github.com/mean-weasel/lineage-landing/pull/1."
+      pr_url: "https://github.com/mean-weasel/lineage-landing/pull/1"
+      residual_risk: "Mobile is visually dense, but acceptable for PR 1 mechanism proof; animation/key highlighting polish is intentionally deferred."
 
 checks:
   dirty_fingerprint: "No implementation branch for hero-scenario-player existed at prep time; docs/goals/hero-scenario-player created from GoalBuddy prep."
