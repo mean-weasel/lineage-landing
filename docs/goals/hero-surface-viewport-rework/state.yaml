@@ -8,7 +8,7 @@ goal:
   slug: "hero-surface-viewport-rework"
   kind: existing_plan
   tranche: "Repair PR #2 so the hero slider uses credible inspectable visual and agent surfaces with aligned markers, synchronized patch/child animation, reset, desktop/mobile proof, and no downstream landing content."
-  status: active
+  status: done
   oracle:
     signal: "Desktop and mobile browser walkthrough of the Lineage landing hero shows enough of the visual app canvas and agent JSON to make the parent selection, JSON patch, and child creation spatially credible; markers align to real screenshot/canvas targets; Play/Reset and scrubber work; no overflow/framework errors; npm run lint and npm run build pass."
     cadence: "after each Worker package and at final audit"
@@ -72,7 +72,7 @@ visual_board:
     url: "http://goalbuddy.localhost:41737/hero-surface-viewport-rework/"
     command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.0/skills/goal-prep/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/hero-surface-viewport-rework"
 
-active_task: T005
+active_task: null
 
 tasks:
   - id: T001
@@ -308,7 +308,7 @@ tasks:
   - id: T005
     type: worker
     assignee: Worker
-    status: active
+    status: done
     reasoning_hint: medium
     objective: "Commit and push the hero surface rework and GoalBuddy board updates to PR #2, then verify the PR state."
     allowed_files:
@@ -325,11 +325,35 @@ tasks:
     stop_if:
       - "Need credentials or repository permissions not available locally."
       - "PR #2 is closed or points to a different head branch."
-    receipt: null
+    receipt:
+      result: done
+      task_id: T005
+      board_path: "/Users/neonwatty/Desktop/lineage-landing/docs/goals/hero-surface-viewport-rework/state.yaml"
+      changed_files:
+        - "src/lib/hero-scenario.ts"
+        - "src/components/landing/hero-scenario-player.tsx"
+        - "src/components/landing/lineage-hero.tsx"
+        - "src/app/globals.css"
+        - "docs/goals/hero-surface-viewport-rework/state.yaml"
+        - "docs/goals/hero-surface-viewport-rework/goal.md"
+        - "docs/goals/hero-surface-viewport-rework/notes/.gitkeep"
+      commands:
+        - cmd: "git commit -m \"Rework hero scenario viewport\""
+          status: pass
+        - cmd: "git push"
+          status: pass
+        - cmd: "git status --short --branch"
+          status: pass
+        - cmd: "gh pr view 2 --json url,state,headRefName,baseRefName,title,commits"
+          status: pass
+      summary: "Committed and pushed the coordinate-correct hero viewport rework plus GoalBuddy board to PR #2. PR #2 remains open from codex/hero-scenario-animation into main and now includes commit f2cf739."
+      pr_url: "https://github.com/mean-weasel/lineage-landing/pull/2"
+      verification_attempts: 1
+      stopped_because: null
   - id: T999
     type: judge
     assignee: Judge
-    status: queued
+    status: done
     reasoning_hint: high
     objective: "Audit whether the revised PR satisfies the original user outcome for this tranche."
     inputs:
@@ -347,11 +371,62 @@ tasks:
       - "full_outcome_complete: true | false"
       - "missing evidence"
       - "next task if not complete"
-    receipt: null
+    receipt:
+      result: done
+      task_id: T999
+      board_path: "/Users/neonwatty/Desktop/lineage-landing/docs/goals/hero-surface-viewport-rework/state.yaml"
+      decision: complete
+      full_outcome_complete: true
+      user_facing_claim: "PR #2 now contains the revised hero-only landing page section: a credible visual/agent comparison slider with taller inspectable source surfaces, phase-based auto-pan, source-coordinate markers/connectors, synchronized JSON patch and child-node animation, Play/Reset controls outside the frame, and desktop/mobile proof."
+      top_failure_modes:
+        - failure: "Markers still point to the wrong places because they are tied to the cropped viewport rather than source screenshot coordinates."
+          evidence:
+            - "T001 proved the old implementation applied marker x/y directly to a cropped 16:9 frame that exposed only about 62.1% of the 1440x1304 source image height."
+            - "T003 browser proof measured post-rework source coordinates back to the scenario data: desktop parent y 38.999, child poster y 71.999, child drill y 62.000; mobile parent y 38.997, child poster y 71.998, child drill y 61.996."
+            - "T004 approved the rework because markers now live on the source-aspect inner canvas and auto-pan brings them into view."
+        - failure: "The slider still feels too cramped or hides the scenario area on desktop/mobile."
+          evidence:
+            - "Fresh final browser probe on http://lineage.localhost:3001/ measured desktop frame 1118x628.875 with source canvas 1118x1012.406, canvas/frame height ratio 1.6099."
+            - "Fresh final browser probe measured mobile frame 391.109x220 with source canvas 391.109x354.156, canvas/frame height ratio 1.6098."
+            - "Fresh final browser probe showed controlsOverlapFrame false on desktop and mobile, no horizontal overflow, and h2Count 0."
+        - failure: "Interaction or framework health regressed while fixing the viewport."
+          evidence:
+            - "npm run lint passed in the final audit."
+            - "npm run build passed in the final audit."
+            - "Fresh browser reload after the fix produced no new warn/error logs; the Next portal measured 0x0; Play and Reset buttons are present."
+            - "T003 browser proof covered Play patch/final states, Reset clearing child nodes/connectors/patch_id/children, scrubber preservation, and mobile no-overflow."
+      pr_url: "https://github.com/mean-weasel/lineage-landing/pull/2"
+      commands:
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "gh pr view 2 --json url,state,headRefName,baseRefName,title --jq '{url,state,headRefName,baseRefName,title}'"
+          status: pass
+        - cmd: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.0/skills/goal-prep/scripts/check-goal-state.mjs docs/goals/hero-surface-viewport-rework"
+          status: pass
+        - cmd: "rg -n \"<LineageHero|start-section|section-band|workflow-rail|terminal-panel|How it works|Start locally\" src/app src/components"
+          status: pass
+        - cmd: "Fresh in-app browser geometry and console probe on http://lineage.localhost:3001/ at 1280x720 and 390x844"
+          status: pass
+      evidence:
+        - "PR #2 remains open from codex/hero-scenario-animation into main: https://github.com/mean-weasel/lineage-landing/pull/2"
+        - "Only the landing page hero renders from src/app/page.tsx:36 in the downstream-content search."
+        - "Worker screenshots: /tmp/lineage-viewport-worker/desktop-patch-v3.png, /tmp/lineage-viewport-worker/desktop-final-v3.png, /tmp/lineage-viewport-worker/mobile-patch-v2.png, /tmp/lineage-viewport-worker/mobile-final-v2.png"
+      residual_risk:
+        - "The compare slider handle still necessarily sits on the boundary and can cover a small central strip; that is inherent to the current scrubber affordance and can be polished later."
+      missing_evidence: []
+      next_task: null
 
 checks:
   dirty_fingerprint: "At prep time, branch codex/hero-scenario-animation exists and PR #2 is open; no uncommitted implementation changes were present."
   last_verification:
-    result: unknown
-    task: null
-    commands: []
+    result: pass
+    task: T999
+    commands:
+      - "npm run lint"
+      - "npm run build"
+      - "gh pr view 2 --json url,state,headRefName,baseRefName,title --jq '{url,state,headRefName,baseRefName,title}'"
+      - "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.0/skills/goal-prep/scripts/check-goal-state.mjs docs/goals/hero-surface-viewport-rework"
+      - "rg -n \"<LineageHero|start-section|section-band|workflow-rail|terminal-panel|How it works|Start locally\" src/app src/components"
+      - "Fresh in-app browser geometry and console probe on http://lineage.localhost:3001/"
