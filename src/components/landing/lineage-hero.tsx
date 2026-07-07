@@ -1,15 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import {
-  ArrowRight,
-  Code2,
-  GitBranch,
-  GripVertical,
-  Image as ImageIcon,
-  MoveHorizontal,
-} from "lucide-react";
+import { ArrowRight, Code2, GitBranch, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
+import { HeroScenarioPlayer } from "@/components/landing/hero-scenario-player";
 import { GITHUB_REPO_URL } from "@/lib/links";
 
 export function LineageHero() {
@@ -60,54 +53,7 @@ export function LineageHero() {
             {position < 50 ? "JSON tree view" : "Visual graph view"}
           </span>
         </div>
-        <div className="compare-frame">
-          <Image
-            src="/swissifier-lineage-json.png"
-            alt="JSON representation of the Swissifier lineage tree"
-            fill
-            priority
-            sizes="(max-width: 900px) 100vw, 1040px"
-            className="compare-image"
-          />
-          <div
-            className="compare-overlay"
-            style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
-          >
-            <Image
-              src="/swissifier-lineage-app.png"
-              alt="Lineage app screenshot showing the Swissifier image seed graph"
-              fill
-              priority
-              sizes="(max-width: 900px) 100vw, 1040px"
-              className="compare-image"
-            />
-          </div>
-          <input
-            className="compare-range"
-            aria-label="Compare visual lineage graph with JSON lineage tree"
-            type="range"
-            min="0"
-            max="100"
-            value={position}
-            onChange={(event) => setPosition(Number(event.target.value))}
-          />
-          <div className="compare-divider" style={{ left: `${position}%` }} aria-hidden="true">
-            <div className="compare-tab">
-              <MoveHorizontal aria-hidden="true" size={18} />
-              <GripVertical aria-hidden="true" size={16} />
-            </div>
-          </div>
-          <div className="compare-badge compare-badge-left">
-            <ImageIcon aria-hidden="true" size={14} />
-            <span className="badge-full">Design surface</span>
-            <span className="badge-short">Design</span>
-          </div>
-          <div className="compare-badge compare-badge-right">
-            <Code2 aria-hidden="true" size={14} />
-            <span className="badge-full">Agent surface</span>
-            <span className="badge-short">Agent</span>
-          </div>
-        </div>
+        <HeroScenarioPlayer position={position} onPositionChange={setPosition} />
       </div>
     </section>
   );

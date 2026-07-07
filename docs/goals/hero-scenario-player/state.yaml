@@ -1,0 +1,329 @@
+# GoalBuddy v2 state.yaml
+# Board truth lives here. goal.md is the editable charter; notes/ holds long receipts only.
+
+version: 2
+
+goal:
+  title: "Hero Scenario Player"
+  slug: "hero-scenario-player"
+  kind: existing_plan
+  tranche: "Deliver PR 1 for a simple data-driven Lineage hero scenario player with parent selection, recorded prompt, child creation, synchronized agent/JSON state, reset, verification, and PR creation."
+  status: done
+  oracle:
+    signal: "Desktop and mobile browser walkthrough of the Lineage landing hero shows the in-image scrubber still working, parent selection, recorded prompt, two child nodes appearing, synchronized agent/JSON update, reset removing child nodes, no downstream content, and passing npm run lint plus npm run build."
+    cadence: "after each Worker package and at final audit"
+    final_proof: "Receipt-backed lint/build results, browser screenshots or walkthrough notes for desktop and mobile, reset proof, no downstream-section proof, and pushed PR URL."
+  intake:
+    original_request: "Plan a repeatable GoalBuddy-backed implementation for the hero visual slider with recorded prompts, child node creation, and reset."
+    interpreted_outcome: "Create a PR-ready repeatable hero scenario player that demonstrates a simple human/agent collaboration flow in the existing slider."
+    input_shape: existing_plan
+    audience: "Lineage landing page visitors and the developer iterating on the hero demo"
+    authority: requested
+    proof_type: demo
+    completion_proof: "A PR branch contains the implemented hero scenario player, passing verification, screenshots/walkthrough evidence, and a PR URL."
+    likely_misfire: "Building a bespoke flashy animation, adding extra landing content, or hardcoding demo behavior instead of creating a simple repeatable scenario system."
+    blind_spots_considered:
+      - "Hero must stay hero-only."
+      - "Scrubber position and scenario timeline must remain separate concerns."
+      - "Prompt must be recorded in data for repeatability."
+      - "Reset must actually remove child nodes from demo state."
+      - "Mobile readability and no overflow are part of done."
+      - "PR 1 should avoid real backend or agent execution."
+    existing_plan_facts:
+      - "Create branch codex/hero-scenario-player before implementation."
+      - "Create src/lib/hero-scenario.ts for parent, prompt, children, and ordered steps."
+      - "Keep the current real Swissifier visual screenshot and add overlays for parent/children."
+      - "Use rendered JSON/text for agent-side state so updates can be highlighted later."
+      - "Add Play and Reset controls; Step is optional only if useful during development."
+      - "Keep landing page hero-only and preserve the in-image scrubber."
+      - "Defer complex animation polish and line/key highlighting to a later PR."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/hero-scenario-player/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.0/skills/goal-prep/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/hero-scenario-player"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: low
+    objective: "Map the existing hero implementation and identify the smallest safe scenario-player design that preserves the current hero-only scrubber."
+    inputs:
+      - "src/app/page.tsx"
+      - "src/components/landing/lineage-hero.tsx"
+      - "src/app/globals.css"
+      - "public/swissifier-lineage-tree.json"
+      - "Current user plan in docs/goals/hero-scenario-player/goal.md"
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation files."
+      - "Do not broaden beyond the hero."
+      - "Prefer concrete file-path evidence and exact component/data boundaries."
+    expected_output:
+      - "Current hero/scrubber map."
+      - "Recommended scenario data shape and exact first implementation slice."
+      - "Risks for mobile/readability/reset."
+      - "Verification commands and browser proof plan."
+    receipt:
+      result: done
+      summary: "Mapped the current hero-only scrubber and identified a safe PR 1 slice: add a data-driven scenario player inside the existing compare frame, with visual overlays, rendered agent JSON, Play/Reset controls, and no downstream page content."
+      evidence:
+        - "src/app/page.tsx:29 shows the page renders only LineageHero inside main."
+        - "src/components/landing/lineage-hero.tsx:15-114 owns the current hero, scrubber state, screenshot layers, invisible in-image range, divider tab, and labels."
+        - "src/app/globals.css:250-363 defines compare shell/frame, image overlay, in-image range, divider tab, and badges."
+        - "public/swissifier-lineage-tree.json contains 14 nodes, 13 edges, root local-5748fb8ba6df, selected next bases local-27050bc5c393 and local-6d06bdbd9f56."
+        - "public/swissifier-lineage-app.png and public/swissifier-lineage-json.png are matching 1440x1304 screenshots."
+      recommended_slice:
+        data_shape:
+          - "HeroAssetNode: id, title, kind, parentId, x, y, status/selected metadata."
+          - "HeroPromptRecord: id, label, prompt."
+          - "HeroScenarioStep: idle, select-parent, show-prompt, create-children, reset."
+          - "HeroScenario: parent, children, prompts, steps."
+        component_boundary:
+          - "Keep LineageHero as the hero shell and scrubber owner."
+          - "Add scenario data in src/lib/hero-scenario.ts."
+          - "Add a client scenario player component under src/components/landing/ that renders visual overlays and agent JSON inside the existing compare-frame."
+        first_worker_slice: "Implement the complete PR 1 scenario player in one vertical slice: data file, player component, LineageHero integration, CSS, Play/Reset controls, scenario-derived JSON update, visual child overlays, reset behavior, verification."
+      risks:
+        - "Rendered JSON must stay legible inside the clipped agent side on mobile."
+        - "Scenario controls must not fight the full-frame invisible scrubber range."
+        - "Reset must clear child overlays and JSON children, not merely hide a CSS class."
+        - "Do not add downstream explanatory sections to compensate for unclear hero behavior."
+      verification_plan:
+        - "npm run lint"
+        - "npm run build"
+        - "Browser proof on desktop and mobile: two images/surfaces load, no horizontal overflow, in-image scrubber moves, Play creates children and updates JSON, Reset removes children, h2Count remains 0."
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Validate the Scout plan and specify the largest safe Worker slice for PR 1."
+    inputs:
+      - "T001 receipt"
+      - "docs/goals/hero-scenario-player/goal.md"
+    constraints:
+      - "Do not implement."
+      - "Reject tasks that add downstream landing content."
+      - "Keep PR 1 simple and data-driven."
+      - "Specify allowed_files, verify commands, and stop_if conditions for Worker."
+    expected_output:
+      - "Decision on implementation approach."
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The Scout slice is appropriately bounded: it preserves the hero-only page and in-image scrubber while adding the smallest repeatable scenario mechanism that proves parent selection, recorded prompt, child creation, synchronized JSON, and reset."
+      worker_package:
+        objective: "Implement PR 1 for the hero scenario player: scenario data, resettable player state, visual overlays, rendered agent JSON, Play/Reset controls, and LineageHero integration without adding downstream sections."
+        allowed_files:
+          - "src/lib/hero-scenario.ts"
+          - "src/components/landing/hero-scenario-player.tsx"
+          - "src/components/landing/lineage-hero.tsx"
+          - "src/app/globals.css"
+        verify:
+          - "npm run lint"
+          - "npm run build"
+          - "Browser proof on desktop and mobile for scrubber, Play, Reset, no downstream sections, and no overflow."
+        stop_if:
+          - "Need files outside allowed_files."
+          - "Scenario requires backend calls or real agent execution."
+          - "Controls conflict with the in-image scrubber in a way that cannot be resolved locally."
+          - "Reset semantics are ambiguous or cannot be proven."
+          - "Verification fails twice."
+      blocked_tasks: []
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Implement PR 1 for the hero scenario player: scenario data, resettable player state, visual overlays, rendered agent JSON, Play/Reset controls, and LineageHero integration without adding downstream sections."
+    allowed_files:
+      - "src/lib/hero-scenario.ts"
+      - "src/components/landing/hero-scenario-player.tsx"
+      - "src/components/landing/lineage-hero.tsx"
+      - "src/app/globals.css"
+    verify:
+      - "npm run lint"
+      - "npm run build"
+      - "Browser proof on desktop and mobile for scrubber, Play, Reset, no downstream sections, and no overflow."
+    stop_if:
+      - "Need files outside Judge-approved allowed_files."
+      - "The scenario requires real backend or agent execution."
+      - "The landing page needs downstream sections to explain the demo."
+      - "Reset behavior is ambiguous."
+      - "Verification fails twice."
+    receipt:
+      result: done
+      changed_files:
+        - "src/lib/hero-scenario.ts"
+        - "src/components/landing/hero-scenario-player.tsx"
+        - "src/components/landing/lineage-hero.tsx"
+        - "src/app/globals.css"
+      commands:
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "Playwright browser proof on http://lineage.localhost:3001: scrubber moved; one Play click created 2 child nodes, recorded prompt, and JSON children; Reset removed children and prompt; h2Count stayed 0; no desktop/mobile overflow."
+          status: pass
+      summary: "Implemented a data-driven hero scenario player. Scenario data records the parent, prompt, children, and ordered steps; the hero frame now renders visual overlays and live agent JSON from resettable state; Play runs the simple flow and Reset clears child nodes and JSON state while preserving the in-image scrubber."
+      evidence:
+        - "/Users/neonwatty/Desktop/lineage-landing/.asset-scratch/proof-hero-scenario-player-final/desktop-played.png"
+        - "/Users/neonwatty/Desktop/lineage-landing/.asset-scratch/proof-hero-scenario-player-final/mobile-played.png"
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Review the implemented scenario player for correctness, simplicity, repeatability, and visual/mobile quality."
+    inputs:
+      - "T003 receipt"
+      - "Current diff"
+      - "Verification outputs"
+      - "Browser screenshots or walkthrough notes"
+    constraints:
+      - "Do not implement."
+      - "Reject if the flow is not data-driven."
+      - "Reject if reset does not remove children."
+      - "Reject if the page is no longer hero-only."
+    expected_output:
+      - "pass | needs_changes"
+      - "Findings with file references if needed."
+      - "Whether a follow-up Worker task is required."
+    receipt:
+      result: done
+      decision: pass
+      full_outcome_complete: false
+      findings: []
+      summary: "Implementation satisfies PR 1 correctness: scenario state is data-driven, Play advances through parent selection, recorded prompt, and two children, Reset returns to empty children/prompt state, the page remains hero-only, and the in-image scrubber remains intact."
+      evidence:
+        - "src/lib/hero-scenario.ts defines parent local-5748fb8ba6df, recorded prompt prompt-swissifier-children-v1, two child nodes, and ordered scenario steps."
+        - "src/components/landing/hero-scenario-player.tsx derives rendered agent JSON and visual overlays from the scenario phase; Reset clears timers, isPlaying, and stepIndex back to 0."
+        - "src/app/page.tsx renders only LineageHero inside main; stale downstream-section scan found no workflow/how-it-works sections."
+        - "npm run lint passed."
+        - "npm run build passed."
+        - "Browser proof screenshots exist at .asset-scratch/proof-hero-scenario-player-final/desktop-played.png and mobile-played.png."
+      follow_up_worker_required: true
+      follow_up_worker_reason: "No code fixes required; T005 should create, push, and open the PR, then record the PR URL."
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Address any Judge-required fixes from T004, then create and push the PR branch."
+    allowed_files:
+      - ".gitignore"
+      - "docs/goals/hero-scenario-player/state.yaml"
+      - "docs/goals/hero-scenario-player/goal.md"
+      - "docs/goals/hero-scenario-player/notes/.gitkeep"
+    verify:
+      - "git status --short"
+      - "gh pr view"
+    stop_if:
+      - "No Judge findings or branch/PR work is needed."
+      - "Need credentials or repository permissions not available locally."
+      - "Fixes require expanding scope beyond PR 1."
+    receipt:
+      result: done
+      changed_files:
+        - ".gitignore"
+        - "docs/goals/hero-scenario-player/state.yaml"
+        - "docs/goals/hero-scenario-player/goal.md"
+        - "docs/goals/hero-scenario-player/notes/.gitkeep"
+      commands:
+        - cmd: "git commit -m \"Add hero scenario player\""
+          status: pass
+        - cmd: "git push -u origin codex/hero-scenario-player"
+          status: pass
+        - cmd: "gh pr create --base main --head codex/hero-scenario-player --title \"Add hero scenario player\""
+          status: pass
+      pr_url: "https://github.com/mean-weasel/lineage-landing/pull/1"
+      summary: "Committed the implementation and GoalBuddy records, pushed codex/hero-scenario-player, created PR #1, and excluded generated local GoalBuddy board assets from the branch."
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether the hero scenario player PR satisfies the original user outcome for this tranche."
+    inputs:
+      - "All done task receipts"
+      - "Last verification"
+      - "Current dirty diff"
+      - "PR URL"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if required Worker work is still queued or active."
+      - "Reject completion if no PR URL exists."
+      - "Reject completion if the oracle is not met."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "missing evidence"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      user_facing_claim: "PR #1 contains a first repeatable hero scenario player for the Lineage landing page: parent selection, recorded prompt, two child nodes, synchronized agent JSON, reset, preserved in-image scrubber, and hero-only page."
+      top_failure_modes:
+        - failure: "The demo is not repeatable or data-driven."
+          evidence: "src/lib/hero-scenario.ts defines the parent, prompt, children, and ordered steps; src/components/landing/hero-scenario-player.tsx derives both visual overlays and JSON from that state."
+        - failure: "Reset only hides UI instead of removing child state."
+          evidence: "Reset clears timers/isPlaying and returns stepIndex to 0; Playwright proof observed childNodes 0, prompt hidden, and JSON children [] after Reset."
+        - failure: "The landing page drifted beyond the requested hero-only scope."
+          evidence: "src/app/page.tsx renders only LineageHero; stale downstream-section scan found no workflow/how-it-works/start sections in page/components."
+      evidence:
+        - "npm run lint passed."
+        - "npm run build passed."
+        - "Playwright proof on http://lineage.localhost:3001 passed for desktop/mobile scrubber movement, Play, Reset, h2Count 0, and no overflow."
+        - "Proof screenshots: .asset-scratch/proof-hero-scenario-player-final/desktop-played.png and mobile-played.png."
+        - "GoalBuddy checker passed with T999 active before final completion."
+        - "PR open: https://github.com/mean-weasel/lineage-landing/pull/1."
+      pr_url: "https://github.com/mean-weasel/lineage-landing/pull/1"
+      residual_risk: "Mobile is visually dense, but acceptable for PR 1 mechanism proof; animation/key highlighting polish is intentionally deferred."
+
+checks:
+  dirty_fingerprint: "No implementation branch for hero-scenario-player existed at prep time; docs/goals/hero-scenario-player created from GoalBuddy prep."
+  last_verification:
+    result: pass
+    task: T004
+    commands:
+      - "npm run lint"
+      - "npm run build"
