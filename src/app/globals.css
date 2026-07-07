@@ -335,7 +335,7 @@ h3 {
 }
 
 .scenario-json {
-  max-height: 66%;
+  max-height: 70%;
   margin-top: 0;
   margin-bottom: 0;
   overflow: hidden;
@@ -471,6 +471,11 @@ h3 {
   transform: translate(-50%, -50%) scale(0.98);
 }
 
+.scenario-node.is-refined {
+  border-color: #0f7a63;
+  background: rgba(224, 255, 244, 0.96);
+}
+
 .scenario-node::before {
   position: absolute;
   inset: -8px;
@@ -500,6 +505,56 @@ h3 {
 
 .scenario-child-node {
   min-width: 118px;
+}
+
+.scenario-popover {
+  position: absolute;
+  z-index: 4;
+  width: min(220px, 22%);
+  border: 1px solid rgba(20, 32, 31, 0.18);
+  border-radius: 8px;
+  padding: 10px 11px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #14201f;
+  box-shadow: 0 18px 42px rgba(20, 32, 31, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(18px, -50%) scale(0.98);
+  animation: scenario-popover-in 260ms ease forwards;
+}
+
+.scenario-popover-left {
+  transform: translate(calc(-100% - 18px), -50%) scale(0.98);
+}
+
+.scenario-popover span {
+  display: block;
+  margin-bottom: 4px;
+  color: #1f8f73;
+  font-size: 0.62rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.scenario-popover strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+
+.scenario-popover p {
+  margin-bottom: 5px;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.scenario-popover em {
+  display: block;
+  color: #50615d;
+  font-size: 0.62rem;
+  font-style: normal;
+  font-weight: 750;
 }
 
 .scenario-agent-beam {
@@ -674,6 +729,12 @@ h3 {
   }
 }
 
+@keyframes scenario-popover-in {
+  to {
+    opacity: 1;
+  }
+}
+
 .site-footer {
   display: flex;
   align-items: center;
@@ -789,6 +850,30 @@ h3 {
 
   .scenario-node strong {
     font-size: 0.49rem;
+  }
+
+  .scenario-popover {
+    width: 120px;
+    padding: 7px;
+    transform: translate(10px, -50%) scale(0.96);
+  }
+
+  .scenario-popover-left {
+    transform: translate(calc(-100% - 10px), -50%) scale(0.96);
+  }
+
+  .scenario-popover span,
+  .scenario-popover em {
+    font-size: 0.48rem;
+  }
+
+  .scenario-popover strong {
+    font-size: 0.52rem;
+  }
+
+  .scenario-popover p {
+    font-size: 0.5rem;
+    line-height: 1.25;
   }
 
   .scenario-controls {

@@ -20,8 +20,8 @@ type HeroScenarioPlayerProps = {
 };
 
 type ScenarioPhase = HeroScenarioStep["type"];
-type JsonHighlight = "parent" | "prompt" | "patch" | "children";
-const STEP_DURATION_MS = 880;
+type JsonHighlight = "parent" | "prompt" | "patch" | "children" | "inspect" | "iteration";
+const STEP_DURATION_MS = 980;
 const HERO_FRAME_ASPECT = 16 / 9;
 const SOURCE_ASPECT = heroScenario.surface.width / heroScenario.surface.height;
 const SOURCE_VISIBLE_HEIGHT_PERCENT = (SOURCE_ASPECT / HERO_FRAME_ASPECT) * 100;
@@ -48,9 +48,24 @@ function buildAgentState(phase: ScenarioPhase) {
   const selectedParent = hasReached(phase, "select-parent")
     ? heroScenario.parent.id
     : null;
-  const prompt = hasReached(phase, "show-prompt") ? heroScenario.prompts[0] : null;
-  const patch = hasReached(phase, "write-json") ? heroScenario.patches[0] : null;
-  const children = hasReached(phase, "create-children") ? heroScenario.children : [];
+  const prompt = hasReached(phase, "prompt-iterate")
+    ? heroScenario.prompts[1]
+    : hasReached(phase, "prompt-create")
+      ? heroScenario.prompts[0]
+      : null;
+  const patch = hasReached(phase, "apply-iteration")
+    ? heroScenario.patches[1]
+    : hasReached(phase, "write-children")
+      ? heroScenario.patches[0]
+      : null;
+  const children = hasReached(phase, "apply-children") ? heroScenario.children : [];
+  const inspectedAsset =
+    phase === "inspect-parent"
+      ? heroScenario.parent
+      : phase === "inspect-child" || phase === "prompt-iterate" || phase === "apply-iteration" || phase === "final"
+        ? heroScenario.children[1]
+        : null;
+  const iterationApplied = hasReached(phase, "apply-iteration");
 
   return {
     selected_parent: selectedParent,
@@ -58,7 +73,7 @@ function buildAgentState(phase: ScenarioPhase) {
     prompt: prompt?.prompt ?? null,
     patch_id: patch?.id ?? null,
     patch_status: patch
-      ? hasReached(phase, "create-children")
+      ? patch.id === heroScenario.patches[1].id || hasReached(phase, "apply-children")
         ? "applied"
         : "queued"
       : null,
@@ -67,45 +82,62 @@ function buildAgentState(phase: ScenarioPhase) {
         op: operation.op,
         path: operation.path,
         asset_id: operation.assetId,
+        field: operation.field,
       })) ?? [],
+    inspected_asset_id: inspectedAsset?.id ?? null,
     children: children.map((child) => ({
       asset_id: child.id,
       title: child.title,
       parent_asset_id: child.parentId,
+      status: child.status === "iterated" && !iterationApplied ? "created" : child.status,
+      selected_for_next_variation:
+        child.selectedForNextVariation && iterationApplied ? true : undefined,
     })),
   };
 }
 
 function activeJsonHighlight(phase: ScenarioPhase): JsonHighlight | null {
-  if (phase === "select-parent") {
+  if (phase === "select-parent" || phase === "inspect-parent") {
     return "parent";
   }
 
-  if (phase === "show-prompt") {
+  if (phase === "prompt-create" || phase === "prompt-iterate") {
     return "prompt";
   }
 
-  if (phase === "write-json") {
+  if (phase === "write-children") {
     return "patch";
   }
 
-  if (phase === "create-children") {
+  if (phase === "apply-children" || phase === "final") {
     return "children";
+  }
+
+  if (phase === "inspect-child") {
+    return "inspect";
+  }
+
+  if (phase === "apply-iteration") {
+    return "iteration";
   }
 
   return null;
 }
 
 function visualFocusY(phase: ScenarioPhase) {
-  if (phase === "write-json") {
+  if (phase === "write-children") {
     return 56;
   }
 
-  if (phase === "create-children") {
+  if (phase === "apply-children") {
     return 66;
   }
 
-  if (phase === "select-parent" || phase === "show-prompt") {
+  if (phase === "inspect-child" || phase === "prompt-iterate" || phase === "apply-iteration" || phase === "final") {
+    return heroScenario.children[1].y;
+  }
+
+  if (phase === "select-parent" || phase === "prompt-create" || phase === "inspect-parent") {
     return heroScenario.parent.y;
   }
 
@@ -121,11 +153,19 @@ function visualPanPercent(phase: ScenarioPhase) {
 }
 
 function agentPan(phase: ScenarioPhase) {
-  if (phase === "create-children") {
+  if (phase === "prompt-iterate" || phase === "apply-iteration" || phase === "final") {
+    return "-142px";
+  }
+
+  if (phase === "inspect-child") {
+    return "-112px";
+  }
+
+  if (phase === "apply-children" || phase === "inspect-parent") {
     return "-84px";
   }
 
-  if (phase === "write-json") {
+  if (phase === "write-children") {
     return "-44px";
   }
 
@@ -161,6 +201,7 @@ function AgentJsonView({
   const highlight = activeJsonHighlight(phase);
   const firstChild = state.children[0];
   const secondChild = state.children[1];
+  const childHighlight = highlight === "children" || highlight === "inspect" || highlight === "iteration";
 
   return (
     <pre className="scenario-json">
@@ -178,29 +219,32 @@ function AgentJsonView({
         <JsonLine active={highlight === "patch"} indent={1}>
           {`"patch_id": ${JSON.stringify(state.patch_id)},`}
         </JsonLine>
-        <JsonLine active={highlight === "patch"} indent={1}>
+        <JsonLine active={highlight === "patch" || highlight === "iteration"} indent={1}>
           {`"patch_status": ${JSON.stringify(state.patch_status)},`}
         </JsonLine>
         {state.operations.length > 0 ? (
           <>
-            <JsonLine active={highlight === "patch"} indent={1}>
+            <JsonLine active={highlight === "patch" || highlight === "iteration"} indent={1}>
               {'"operations": ['}
             </JsonLine>
             {state.operations.map((operation, index) => (
-              <JsonLine key={operation.path} active={highlight === "patch"} indent={2}>
+              <JsonLine key={operation.path} active={highlight === "patch" || highlight === "iteration"} indent={2}>
                 {`${JSON.stringify(operation)}${index === state.operations.length - 1 ? "" : ","}`}
               </JsonLine>
             ))}
-            <JsonLine active={highlight === "patch"} indent={1}>
+            <JsonLine active={highlight === "patch" || highlight === "iteration"} indent={1}>
               {"],"}
             </JsonLine>
           </>
         ) : (
           <JsonLine indent={1}>{'"operations": [],'}</JsonLine>
         )}
+        <JsonLine active={highlight === "inspect"} indent={1}>
+          {`"inspected_asset_id": ${JSON.stringify(state.inspected_asset_id)},`}
+        </JsonLine>
         {firstChild || secondChild ? (
           <>
-            <JsonLine active={highlight === "children"} indent={1}>
+            <JsonLine active={childHighlight} indent={1}>
               {'"children": ['}
             </JsonLine>
             {firstChild ? (
@@ -209,11 +253,11 @@ function AgentJsonView({
               </JsonLine>
             ) : null}
             {secondChild ? (
-              <JsonLine active={highlight === "children"} indent={2}>
+              <JsonLine active={childHighlight} indent={2}>
                 {JSON.stringify(secondChild)}
               </JsonLine>
             ) : null}
-            <JsonLine active={highlight === "children"} indent={1}>
+            <JsonLine active={childHighlight} indent={1}>
               {"]"}
             </JsonLine>
           </>
@@ -231,21 +275,43 @@ function NodeMarker({
   active,
   focus,
   preview,
+  refined,
 }: {
   node: (typeof heroScenario.children)[number] | typeof heroScenario.parent;
   active: boolean;
   focus?: boolean;
   preview?: boolean;
+  refined?: boolean;
 }) {
   return (
     <div
       className={`scenario-node ${node.kind === "parent" ? "scenario-parent-node" : "scenario-child-node"} ${
         active ? "is-active" : ""
-      } ${focus ? "is-focused" : ""} ${preview ? "is-preview" : ""}`}
+      } ${focus ? "is-focused" : ""} ${preview ? "is-preview" : ""} ${refined ? "is-refined" : ""}`}
       style={{ left: `${node.x}%`, top: `${node.y}%` }}
     >
       <span>{node.kind === "parent" ? "Parent" : "Child"}</span>
       <strong>{node.title}</strong>
+    </div>
+  );
+}
+
+function NodePopover({
+  node,
+  align = "right",
+}: {
+  node: (typeof heroScenario.children)[number] | typeof heroScenario.parent;
+  align?: "left" | "right";
+}) {
+  return (
+    <div
+      className={`scenario-popover scenario-popover-${align}`}
+      style={{ left: `${node.x}%`, top: `${node.y}%` }}
+    >
+      <span>{node.kind === "parent" ? "Parent context" : "Child context"}</span>
+      <strong>{node.title}</strong>
+      <p>{node.summary}</p>
+      <em>{node.promptHint}</em>
     </div>
   );
 }
@@ -259,13 +325,26 @@ export function HeroScenarioPlayer({
   const timersRef = useRef<number[]>([]);
   const phase = stepPhase(stepIndex);
   const agentState = useMemo(() => buildAgentState(phase), [phase]);
-  const showPrompt = hasReached(phase, "show-prompt");
-  const showPatch = hasReached(phase, "write-json");
-  const showChildren = hasReached(phase, "create-children");
+  const currentPrompt = hasReached(phase, "prompt-iterate")
+    ? heroScenario.prompts[1]
+    : hasReached(phase, "prompt-create")
+      ? heroScenario.prompts[0]
+      : null;
+  const showPatch = hasReached(phase, "write-children");
+  const showChildren = hasReached(phase, "apply-children");
   const selectedParent = hasReached(phase, "select-parent");
-  const focusParent = phase === "select-parent" || phase === "show-prompt";
-  const focusPatch = phase === "write-json";
-  const focusChildren = phase === "create-children";
+  const focusParent =
+    phase === "select-parent" || phase === "prompt-create" || phase === "write-children" || phase === "inspect-parent";
+  const focusPatch = phase === "write-children";
+  const focusChildren = phase === "apply-children" || phase === "inspect-child";
+  const focusRefinedChild = phase === "prompt-iterate" || phase === "apply-iteration" || phase === "final";
+  const showParentPopover = phase === "inspect-parent";
+  const showChildPopover =
+    phase === "inspect-child" ||
+    phase === "prompt-iterate" ||
+    phase === "apply-iteration" ||
+    phase === "final";
+  const iterationApplied = hasReached(phase, "apply-iteration");
   const currentStep = heroScenario.steps[stepIndex];
   const isComplete = stepIndex === heroScenario.steps.length - 1;
   const modeLabel = position < 50 ? "Agent surface view" : "Visual graph view";
@@ -352,10 +431,10 @@ export function HeroScenarioPlayer({
               <Code2 aria-hidden="true" size={15} />
               Agent state
             </div>
-            {showPrompt ? (
+            {currentPrompt ? (
               <div className="scenario-prompt">
-                <span>{heroScenario.prompts[0].label}</span>
-                <p>{heroScenario.prompts[0].prompt}</p>
+                <span>{currentPrompt.label}</span>
+                <p>{currentPrompt.prompt}</p>
               </div>
             ) : null}
             <AgentJsonView phase={phase} state={agentState} />
@@ -420,11 +499,20 @@ export function HeroScenarioPlayer({
                     key={child.id}
                     node={child}
                     active={showPatch || showChildren}
-                    focus={focusChildren}
+                    focus={
+                      child.id === heroScenario.children[1].id
+                        ? focusChildren || focusRefinedChild
+                        : focusChildren
+                    }
                     preview={showPatch && !showChildren}
+                    refined={child.id === heroScenario.children[1].id && iterationApplied}
                   />
                 ))
               : null}
+            {showParentPopover ? <NodePopover node={heroScenario.parent} /> : null}
+            {showChildPopover ? (
+              <NodePopover node={heroScenario.children[1]} align="left" />
+            ) : null}
           </div>
         </div>
       </div>
